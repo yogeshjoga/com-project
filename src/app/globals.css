@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+/* Brand tokens — change these to rebrand. */
+:root {
+  --ink: #0e2a49;
+  --ink-2: #123a5e;
+  --muted: #5b6880;
+  --paper: #f5f7fa;
+  --surface: #ffffff;
+  --line: #dce2ea;
+  --signal: #c8a127;
+  --signal-hover: #d8b445;
+  --signal-ink: #7d600c;
+  --go: #0b9f6b;
+  --warn: #b7791f;
+  --hud: #7cf0c8;
+  --chart: #2f6fb3;
+  --danger: #b42318;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-signal: var(--signal);
+  --color-signal-ink: var(--signal-ink);
+  --color-signal-hover: var(--signal-hover);
+  --color-go: var(--go);
+  --color-warn: var(--warn);
+  --color-hud: var(--hud);
+  --color-chart: var(--chart);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-plex);
+  --font-display: var(--font-barlow);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-plex), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-barlow), var(--font-plex), sans-serif;
+  letter-spacing: 0.005em;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+/* OSD frame used only in the home hero. */
+.osd-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-color: var(--hud);
+  border-style: solid;
+  border-width: 0;
+}
+
+@keyframes scan {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(100%); }
+}
+.osd-scan {
+  animation: scan 3.2s linear 1 both;
+}
+
+@keyframes drawer-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.drawer-in {
+  animation: drawer-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
