@@ -11,6 +11,7 @@ const tabs = [
   { key: "open", label: "To ship", statuses: ["confirmed", "packed"] },
   { key: "shipped", label: "Shipped", statuses: ["shipped"] },
   { key: "delivered", label: "Delivered", statuses: ["delivered"] },
+  { key: "awaiting", label: "Awaiting payment", statuses: ["awaiting_payment"] },
   { key: "cancelled", label: "Cancelled", statuses: ["cancelled"] },
   { key: "all", label: "All", statuses: [] as string[] },
 ];
@@ -28,6 +29,7 @@ export default function OrdersPage({ searchParams }: PageProps<"/shop/orders">) 
 
 async function Orders({ searchParams }: { searchParams: PageProps<"/shop/orders">["searchParams"] }) {
   const { sb } = await requireShopAdmin();
+  await sb.rpc("shop_expire_unpaid"); // release stock from abandoned online payments
   const sp = await searchParams;
   const tab = tabs.find((t) => t.key === sp.status) ?? tabs[0];
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
@@ -88,7 +90,7 @@ async function Orders({ searchParams }: { searchParams: PageProps<"/shop/orders"
                   <p className="text-xs text-muted">{(o.address as { city?: string; state?: string })?.city}, {(o.address as { state?: string })?.state}</p>
                 </td>
                 <td className="px-3 py-3 text-muted tabular">{new Date(o.created_at).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })}</td>
-                <td className="px-3 py-3"><span className="uppercase text-muted">{o.payment_method}</span> <StatusPill status={o.payment_status} /></td>
+                <td className="px-3 py-3"><span className="text-muted">{o.payment_method === "cod" ? "COD" : "Online"}</span> <StatusPill status={o.payment_status} /></td>
                 <td className="px-3 py-3"><StatusPill status={o.status} /></td>
                 <td className="px-4 py-3 text-right font-medium tabular">{formatINR(o.total)}</td>
               </tr>

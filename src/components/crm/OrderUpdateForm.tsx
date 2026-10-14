@@ -39,6 +39,7 @@ export function OrderUpdateForm({ id, initial, paymentMethod }: { id: string; in
       <label className="block text-sm">
         <span className="font-medium">Order status</span>
         <select value={f.status} onChange={set("status")} disabled={locked} className={`${inputCls} mt-1.5`}>
+          {initial.status === "awaiting_payment" ? <option value="awaiting_payment">Awaiting payment</option> : null}
           <option value="confirmed">Confirmed</option>
           <option value="packed">Packed</option>
           <option value="shipped">Shipped</option>
@@ -47,7 +48,7 @@ export function OrderUpdateForm({ id, initial, paymentMethod }: { id: string; in
         </select>
       </label>
       <label className="block text-sm">
-        <span className="font-medium">Payment</span> <span className="text-muted uppercase">({paymentMethod})</span>
+        <span className="font-medium">Payment</span> <span className="text-muted">({paymentMethod === "cod" ? "cash on delivery" : "online, Razorpay"})</span>
         <select value={f.payment_status} onChange={set("payment_status")} disabled={locked} className={`${inputCls} mt-1.5`}>
           <option value="pending">Pending</option>
           <option value="paid">Paid</option>

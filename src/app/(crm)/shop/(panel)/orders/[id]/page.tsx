@@ -61,6 +61,25 @@ async function Order({ params }: Pick<PageProps<"/shop/orders/[id]">, "params">)
             </dl>
           </Card>
 
+          {o.payment_method !== "cod" ? (
+            <Card title="Payment">
+              <dl className="grid gap-2 text-sm sm:grid-cols-2">
+                <div><dt className="text-muted">Method</dt><dd>Online (Razorpay)</dd></div>
+                <div><dt className="text-muted">Paid at</dt><dd>{o.paid_at ? new Date(o.paid_at).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "Not paid yet"}</dd></div>
+                <div><dt className="text-muted">Razorpay order</dt><dd className="tabular">{o.razorpay_order_id ?? "Not created"}</dd></div>
+                <div>
+                  <dt className="text-muted">Razorpay payment</dt>
+                  <dd className="tabular">
+                    {o.razorpay_payment_id ? (
+                      <a href={`https://dashboard.razorpay.com/app/payments/${o.razorpay_payment_id}`} target="_blank" rel="noopener" className="text-signal-ink hover:underline">{o.razorpay_payment_id}</a>
+                    ) : "None"}
+                  </dd>
+                </div>
+              </dl>
+              <p className="mt-3 text-xs text-muted">Refunds are issued from the Razorpay dashboard. Then set payment to Refunded here.</p>
+            </Card>
+          ) : null}
+
           <Card title="Customer">
             <div className="grid gap-4 text-sm sm:grid-cols-2">
               <div>

@@ -21,6 +21,18 @@ npm run dev                  # http://localhost:3000
 
 **Speed:** catalog pages are prerendered and cached (`use cache`, `cacheLife('minutes')`). CRM edits and orders call `updateTag()`, so the store shows changes within seconds without losing the static speed.
 
+## Payments (Razorpay)
+
+Customers choose **Pay online** (UPI, cards, net banking, wallets via Razorpay Checkout) or **Cash on delivery**.
+
+1. `shop_place_order` reserves stock and creates the order as `awaiting_payment`.
+2. The server creates a Razorpay order for the exact database total and opens Checkout in the browser.
+3. On success, the server verifies Razorpay's HMAC signature and calls `shop_mark_paid`. The order becomes `confirmed` + `paid`, and admins get a CRM alert.
+4. The webhook `POST /api/razorpay/webhook` (`payment.captured`, `order.paid`) confirms payments even if the customer closed the tab.
+5. Online orders still unpaid after 30 minutes are auto-cancelled and their stock is released. This runs on each new checkout and on dashboard load.
+
+Payment-state functions require `SHOP_SERVER_SECRET`, whose SHA-256 is stored in `shop_private`, so the public API can't mark orders paid. Online payment only appears at checkout once `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` and `SHOP_SERVER_SECRET` are set. Refunds are done in the Razorpay dashboard, after which you set the payment to *Refunded* on the order page.
+
 ## CRM e-commerce dashboard (`/shop`)
 
 Only **super_admin** and **admin** CRM accounts can open it, enforced three ways: the page guard, server-action checks, and Postgres RLS via the CRM's own `has_module_access('shop', …)`. Accounts with MFA must enter their authenticator code.
@@ -42,6 +54,9 @@ Migrations live in `supabase/migrations/` and are already applied to `egirerobot
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://txbrnewcztixcagdnnfx.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | the project's publishable key |
+| `SHOP_SERVER_SECRET` | server-only, sensitive; its SHA-256 lives in `shop_private` |
+| `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` | Razorpay Dashboard > Account & Settings > API Keys (test keys first) |
+| `RAZORPAY_WEBHOOK_SECRET` | the secret you set on the webhook below |
 | `SHOP_ADMIN_ONLY_ON_CRM_HOST` | optional, `true` to serve `/shop` only on `CRM_HOST` |
 | `CRM_HOST` | optional, default `crm.egirerobotics.com` |
 
@@ -63,6 +78,6 @@ Name, contact and logo files are in `src/config/brand.ts`. Colours are the `:roo
 
 ## Not wired up yet
 
-- Online payment gateway (Razorpay / Cashfree). Non-COD orders are created as *payment pending*.
+- Razorpay keys (until they're set, checkout offers cash on delivery only). Webhook URL: `https://shop.egirerobotics.com/api/razorpay/webhook`, events `payment.captured` and `order.paid`.
 - Customer accounts (OTP sign-in) and courier serviceability API for PIN codes.
 - Support phone, WhatsApp and GSTIN in `brand.ts` (left empty, so they're hidden until filled in).

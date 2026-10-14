@@ -159,7 +159,7 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
 
 // ───────────────────────── Orders
 
-const STATUSES = ["confirmed", "packed", "shipped", "delivered", "cancelled"] as const;
+const STATUSES = ["awaiting_payment", "confirmed", "packed", "shipped", "delivered", "cancelled"] as const;
 const PAYMENT = ["pending", "paid", "refunded"] as const;
 
 export async function updateOrder(

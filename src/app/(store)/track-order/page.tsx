@@ -6,7 +6,7 @@ import { formatINR } from "@/lib/format";
 import { trackOrder, type TrackResult } from "../checkout/actions";
 
 const stages = ["confirmed", "packed", "shipped", "delivered"] as const;
-const label: Record<string, string> = { confirmed: "Confirmed", packed: "Packed", shipped: "Shipped", delivered: "Delivered", cancelled: "Cancelled" };
+const label: Record<string, string> = { awaiting_payment: "Awaiting payment", confirmed: "Confirmed", packed: "Packed", shipped: "Shipped", delivered: "Delivered", cancelled: "Cancelled" };
 const field = "h-11 w-full rounded-md bg-white px-3 ring-1 ring-line focus:outline-none focus:ring-2 focus:ring-signal";
 
 export default function TrackOrderPage() {
@@ -43,7 +43,9 @@ export default function TrackOrderPage() {
               <p className="font-semibold tabular">{order.id}</p>
               <p className="text-sm text-muted tabular">{formatINR(order.total)}</p>
             </div>
-            {order.status === "cancelled" ? (
+            {order.status === "awaiting_payment" ? (
+              <p className="mt-4 font-medium text-signal-ink">We haven’t received the payment yet. Unpaid orders are released after 30 minutes.</p>
+            ) : order.status === "cancelled" ? (
               <p className="mt-4 font-medium text-signal-ink">This order was cancelled.</p>
             ) : (
               <ol className="mt-5 space-y-4">

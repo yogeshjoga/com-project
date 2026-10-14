@@ -10,6 +10,7 @@ interface Stats {
   revenue_30d: number;
   orders_30d: number;
   to_ship: number;
+  awaiting_payment: number;
   products: number;
   low_stock: number;
   daily: { day: string; revenue: number; orders: number }[];
@@ -36,6 +37,7 @@ export default function DashboardPage() {
 
 async function Dashboard() {
   const { sb } = await requireShopAdmin();
+  await sb.rpc("shop_expire_unpaid"); // release stock from abandoned online payments
   const [{ data: stats }, { data: recent }, { data: lowProducts }, { data: lowVariants }] = await Promise.all([
     sb.rpc("shop_dashboard_stats"),
     sb.from("shop_orders").select("id, customer_name, total, status, payment_method, created_at").order("created_at", { ascending: false }).limit(8),
@@ -57,7 +59,7 @@ async function Dashboard() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatTile label="Revenue today" value={formatINR(s.revenue_today ?? 0)} />
         <StatTile label="Revenue, 30 days" value={formatINR(s.revenue_30d ?? 0)} note={`${s.orders_30d ?? 0} orders`} />
-        <StatTile label="Orders to ship" value={String(s.to_ship ?? 0)} note="Confirmed or packed" href="/shop/orders?status=open" />
+        <StatTile label="Orders to ship" value={String(s.to_ship ?? 0)} note={s.awaiting_payment ? `${s.awaiting_payment} more awaiting payment` : "Confirmed or packed"} href="/shop/orders?status=open" />
         <StatTile label="Low or out of stock" value={String(low.length)} note={`of ${s.products ?? 0} live products`} href="/shop/products?filter=low" />
       </div>
 

@@ -28,6 +28,7 @@ export function StatTile({ label, value, note, href }: { label: string; value: s
 }
 
 const statusStyle: Record<string, string> = {
+  awaiting_payment: "bg-[#fdf6e3] text-signal-ink",
   confirmed: "bg-[#eef3f7] text-ink-2",
   packed: "bg-[#fdf6e3] text-signal-ink",
   shipped: "bg-[#e8f1fb] text-chart",
@@ -39,6 +40,7 @@ const statusStyle: Record<string, string> = {
 };
 
 export const statusLabel: Record<string, string> = {
+  awaiting_payment: "Awaiting payment",
   confirmed: "Confirmed", packed: "Packed", shipped: "Shipped", delivered: "Delivered", cancelled: "Cancelled",
   pending: "Payment pending", paid: "Paid", refunded: "Refunded",
 };
