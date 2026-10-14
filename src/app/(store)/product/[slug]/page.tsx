@@ -25,7 +25,8 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
   const p = await getProduct(slug);
   if (!p) notFound();
   const c = categoryBySlug.get(p.category)!;
-  const brandLogo = (await getBrandInfo())[brandSlug(p.brand)]?.logoUrl;
+  const brandInfo = (await getBrandInfo())[brandSlug(p.brand)];
+  const brandLogo = brandInfo?.logoUrl;
   const d = departmentBySlug.get(c.department)!;
 
   const jsonLd = {
@@ -69,7 +70,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
           <div>
             <Link href={`/brand/${brandSlug(p.brand)}`} className="inline-flex items-center gap-2 text-sm font-medium text-signal-ink hover:underline">
               {brandLogo ? (
-                <span className="block w-24"><BrandLogo name={p.brand} logoUrl={brandLogo} className="h-7" sizes="96px" /></span>
+                <BrandLogo name={p.brand} logoUrl={brandLogo} width={brandInfo?.logoWidth} height={brandInfo?.logoHeight} maxW={110} maxH={30} area={1500} />
               ) : null}
               <span className={brandLogo ? "sr-only" : ""}>{p.brand}</span>
             </Link>

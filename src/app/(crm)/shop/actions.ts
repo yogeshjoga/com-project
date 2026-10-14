@@ -265,7 +265,14 @@ export async function signOut() {
 
 // ───────────────────────── Brands
 
-export async function saveBrand(input: { slug: string; name: string; logo_url: string | null; website: string }): Promise<ActionResult> {
+export async function saveBrand(input: {
+  slug: string;
+  name: string;
+  logo_url: string | null;
+  logo_width: number | null;
+  logo_height: number | null;
+  website: string;
+}): Promise<ActionResult> {
   try {
     const { sb } = await assertShopAdmin();
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(input.slug)) throw new Error("Invalid brand.");
@@ -274,7 +281,15 @@ export async function saveBrand(input: { slug: string; name: string; logo_url: s
     const logo = input.logo_url?.trim() || null;
     if (logo && !/^(\/|https:\/\/)/.test(logo)) throw new Error("Invalid logo URL.");
     const { error } = await sb.from("shop_brands").upsert(
-      { slug: input.slug, name: input.name.trim(), logo_url: logo, website: website || null, logo_source: logo?.startsWith("https://") ? "Uploaded in CRM" : undefined },
+      {
+        slug: input.slug,
+        name: input.name.trim(),
+        logo_url: logo,
+        logo_width: logo && input.logo_width && input.logo_width > 0 ? Math.round(input.logo_width) : null,
+        logo_height: logo && input.logo_height && input.logo_height > 0 ? Math.round(input.logo_height) : null,
+        website: website || null,
+        logo_source: logo?.startsWith("https://") ? "Uploaded in CRM" : undefined,
+      },
       { onConflict: "slug" },
     );
     if (error) throw error;

@@ -12,6 +12,8 @@ export interface BrandRow {
   name: string;
   count: number;
   logoUrl: string | null;
+  logoWidth: number | null;
+  logoHeight: number | null;
   website: string;
 }
 
@@ -31,6 +33,7 @@ export function BrandsManager({ rows }: { rows: BrandRow[] }) {
 
 function BrandCard({ row }: { row: BrandRow }) {
   const [logo, setLogo] = useState(row.logoUrl);
+  const [size, setSize] = useState<{ w: number | null; h: number | null }>({ w: row.logoWidth, h: row.logoHeight });
   const [website, setWebsite] = useState(row.website);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -43,6 +46,10 @@ function BrandCard({ row }: { row: BrandRow }) {
     if (file.size > 1024 * 1024) return setMsg({ ok: false, text: "Logo files must be 1 MB or smaller." });
     setUploading(true);
     setMsg(null);
+    // Intrinsic size lets the store size every logo to the same visual weight.
+    const bmp = await createImageBitmap(file).catch(() => null);
+    const dims = bmp ? { w: bmp.width, h: bmp.height } : { w: null, h: null };
+    bmp?.close();
     const ext = file.type.split("/")[1].replace("jpeg", "jpg");
     const path = `shop/brands/${row.slug}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
     const sb = browserClient();
@@ -50,11 +57,12 @@ function BrandCard({ row }: { row: BrandRow }) {
     setUploading(false);
     if (error) return setMsg({ ok: false, text: `Upload failed: ${error.message}` });
     setLogo(sb.storage.from("site-media").getPublicUrl(path).data.publicUrl);
+    setSize(dims);
   }
 
   function save() {
     start(async () => {
-      const res = await saveBrand({ slug: row.slug, name: row.name, logo_url: logo, website });
+      const res = await saveBrand({ slug: row.slug, name: row.name, logo_url: logo, logo_width: logo ? size.w : null, logo_height: logo ? size.h : null, website });
       setMsg(res.ok ? { ok: true, text: "Saved. The store updates within seconds." } : { ok: false, text: res.error });
       if (res.ok) router.refresh();
     });
@@ -66,8 +74,8 @@ function BrandCard({ row }: { row: BrandRow }) {
         <p className="font-medium">{row.name}</p>
         <p className="text-xs text-muted tabular">{row.count} {row.count === 1 ? "product" : "products"}</p>
       </div>
-      <div className="mt-3 flex h-20 items-center rounded-md border border-line bg-white px-4">
-        <BrandLogo name={row.name} logoUrl={logo} className="h-11" sizes="280px" />
+      <div className="mt-3 flex h-24 items-center justify-center rounded-md border border-line bg-white px-4">
+        <BrandLogo name={row.name} logoUrl={logo} width={size.w} height={size.h} />
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-3 text-sm">
         <label className="cursor-pointer rounded-md px-3 py-1.5 font-medium ring-1 ring-line hover:ring-ink">

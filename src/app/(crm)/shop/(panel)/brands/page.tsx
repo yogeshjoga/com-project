@@ -22,7 +22,7 @@ async function Brands() {
   const { sb } = await requireShopAdmin();
   const [{ data: products }, { data: saved }] = await Promise.all([
     sb.from("shop_products").select("brand"),
-    sb.from("shop_brands").select("slug, name, logo_url, website"),
+    sb.from("shop_brands").select("slug, name, logo_url, logo_width, logo_height, website"),
   ]);
   const counts = new Map<string, { name: string; count: number }>();
   for (const p of products ?? []) {
@@ -37,6 +37,8 @@ async function Brands() {
       name,
       count,
       logoUrl: bySlug.get(slug)?.logo_url ?? null,
+      logoWidth: bySlug.get(slug)?.logo_width ?? null,
+      logoHeight: bySlug.get(slug)?.logo_height ?? null,
       website: bySlug.get(slug)?.website ?? "",
     }))
     .sort((a, b) => Number(Boolean(a.logoUrl)) - Number(Boolean(b.logoUrl)) || a.name.localeCompare(b.name));

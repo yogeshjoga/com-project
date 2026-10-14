@@ -25,8 +25,8 @@ export default async function BrandPage({ params }: PageProps<"/brand/[slug]">) 
       {b.logoUrl || b.website ? (
         <div className="mx-auto -mt-2 mb-6 flex max-w-7xl flex-wrap items-center gap-4 px-4">
           {b.logoUrl ? (
-            <div className="flex h-20 w-56 items-center rounded-lg border border-line bg-white px-5">
-              <BrandLogo name={b.name} logoUrl={b.logoUrl} className="h-11" sizes="224px" />
+            <div className="flex h-24 w-60 items-center justify-center rounded-lg border border-line bg-white px-6">
+              <BrandLogo name={b.name} logoUrl={b.logoUrl} width={b.logoWidth} height={b.logoHeight} maxW={180} maxH={56} area={4600} priority />
             </div>
           ) : null}
           {b.website ? (

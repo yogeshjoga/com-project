@@ -5,7 +5,7 @@ import { Hero } from "@/components/Hero";
 import { Section } from "@/components/Section";
 import { ProductGrid, ProductRail } from "@/components/ProductCard";
 import { CategoryTile } from "@/components/CategoryTile";
-import { BrandLogo } from "@/components/BrandLogo";
+import { BrandWall } from "@/components/BrandWall";
 
 const featuredCats = [
   "fpv-drones", "whoops-micro", "camera-drones", "goggles", "air-units", "frames",
@@ -90,15 +90,7 @@ export default async function Home() {
       </Section>
 
       <Section title="Brands we stock" href="/brands" linkLabel="All brands">
-        <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
-          {brandList.filter((b) => b.logoUrl).slice(0, 18).map((b) => (
-            <li key={b.slug}>
-              <Link href={`/brand/${b.slug}`} title={b.name} className="flex h-20 items-center rounded-md border border-line bg-white px-4 transition-colors hover:border-ink/40">
-                <BrandLogo name={b.name} logoUrl={b.logoUrl} className="h-9" sizes="160px" />
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <BrandWall items={brandList.filter((b) => b.logoUrl).slice(0, 12)} />
       </Section>
 
     </>

@@ -162,6 +162,8 @@ export interface BrandInfo {
   slug: string;
   name: string;
   logoUrl: string | null;
+  logoWidth: number | null;
+  logoHeight: number | null;
   website: string | null;
 }
 
@@ -171,10 +173,13 @@ export async function getBrandInfo(): Promise<Record<string, BrandInfo>> {
   cacheTag(TAG_BRANDS);
   cacheLife("minutes");
   if (!supabaseConfigured) return {};
-  const { data, error } = await publicClient().from("shop_brands").select("slug, name, logo_url, website");
+  const { data, error } = await publicClient().from("shop_brands").select("slug, name, logo_url, logo_width, logo_height, website");
   if (error) throw new Error(`Brand read failed: ${error.message}`);
   return Object.fromEntries(
-    (data ?? []).map((b) => [b.slug, { slug: b.slug, name: b.name, logoUrl: b.logo_url, website: b.website }]),
+    (data ?? []).map((b) => [
+      b.slug,
+      { slug: b.slug, name: b.name, logoUrl: b.logo_url, logoWidth: b.logo_width, logoHeight: b.logo_height, website: b.website },
+    ]),
   );
 }
 
@@ -185,7 +190,12 @@ export async function brands() {
   return [...counts.entries()]
     .map(([name, count]) => {
       const slug = brandSlug(name);
-      return { name, slug, count, logoUrl: info[slug]?.logoUrl ?? null, website: info[slug]?.website ?? null };
+      const i = info[slug];
+      return {
+        name, slug, count,
+        logoUrl: i?.logoUrl ?? null, logoWidth: i?.logoWidth ?? null, logoHeight: i?.logoHeight ?? null,
+        website: i?.website ?? null,
+      };
     })
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 }
