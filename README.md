@@ -40,6 +40,7 @@ Only **super_admin** and **admin** CRM accounts can open it, enforced three ways
 - **Dashboard:** revenue today and over 30 days, orders to ship, low stock, a daily revenue chart, recent orders and top sellers
 - **Products & stock:** search and filter, inline stock edits, show or hide on the store, add, edit and delete products, options, photo upload (to the `site-media` bucket under `shop/`)
 - **Orders:** status (confirmed → packed → shipped → delivered, or cancelled, which returns stock), payment status, courier and tracking, staff notes
+- **Brands:** upload or replace brand logos (PNG/WebP/JPG) and set the official website. Logos show on the Brands page, brand pages, product pages and the home page logo wall. 36 logos ship in `public/brands/`, taken from each brand's official website or Wikimedia Commons (sources stored in `shop_brands.logo_source`).
 - **Notifications:** store announcement bar (info / deal / alert, optional end time). New-order and low-stock alerts go to the CRM notification bell of every active admin and super admin.
 
 ## Database

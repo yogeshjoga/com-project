@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { updateTag } from "next/cache";
 import { assertShopAdmin } from "@/lib/crm/auth";
-import { TAG_ANNOUNCEMENTS, TAG_CATALOG } from "@/lib/catalog";
+import { TAG_ANNOUNCEMENTS, TAG_BRANDS, TAG_CATALOG } from "@/lib/catalog";
 import { categoryBySlug } from "@/data/categories";
 
 export type ActionResult = { ok: true; id?: string } | { ok: false; error: string };
@@ -261,4 +261,26 @@ export async function signOut() {
   const sb = await serverClient();
   await sb.auth.signOut();
   redirect("/shop/login");
+}
+
+// ───────────────────────── Brands
+
+export async function saveBrand(input: { slug: string; name: string; logo_url: string | null; website: string }): Promise<ActionResult> {
+  try {
+    const { sb } = await assertShopAdmin();
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(input.slug)) throw new Error("Invalid brand.");
+    const website = input.website.trim();
+    if (website && !/^https:\/\//.test(website)) throw new Error("The website must start with https://");
+    const logo = input.logo_url?.trim() || null;
+    if (logo && !/^(\/|https:\/\/)/.test(logo)) throw new Error("Invalid logo URL.");
+    const { error } = await sb.from("shop_brands").upsert(
+      { slug: input.slug, name: input.name.trim(), logo_url: logo, website: website || null, logo_source: logo?.startsWith("https://") ? "Uploaded in CRM" : undefined },
+      { onConflict: "slug" },
+    );
+    if (error) throw error;
+    updateTag(TAG_BRANDS);
+    return { ok: true };
+  } catch (e) {
+    return fail(e);
+  }
 }

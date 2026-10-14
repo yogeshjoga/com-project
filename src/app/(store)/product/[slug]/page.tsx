@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { brand } from "@/config/brand";
 import { categoryBySlug, departmentBySlug } from "@/data/categories";
-import { brandSlug, getProduct, getProducts, related } from "@/lib/catalog";
+import { brandSlug, getBrandInfo, getProduct, getProducts, related } from "@/lib/catalog";
+import { BrandLogo } from "@/components/BrandLogo";
 import { ProductMedia } from "@/components/ProductMedia";
 import { BuyBox } from "@/components/BuyBox";
 import { Breadcrumbs, Section } from "@/components/Section";
@@ -24,6 +25,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
   const p = await getProduct(slug);
   if (!p) notFound();
   const c = categoryBySlug.get(p.category)!;
+  const brandLogo = (await getBrandInfo())[brandSlug(p.brand)]?.logoUrl;
   const d = departmentBySlug.get(c.department)!;
 
   const jsonLd = {
@@ -65,7 +67,12 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
           </div>
 
           <div>
-            <Link href={`/brand/${brandSlug(p.brand)}`} className="text-sm font-medium text-signal-ink hover:underline">{p.brand}</Link>
+            <Link href={`/brand/${brandSlug(p.brand)}`} className="inline-flex items-center gap-2 text-sm font-medium text-signal-ink hover:underline">
+              {brandLogo ? (
+                <span className="block w-24"><BrandLogo name={p.brand} logoUrl={brandLogo} className="h-7" sizes="96px" /></span>
+              ) : null}
+              <span className={brandLogo ? "sr-only" : ""}>{p.brand}</span>
+            </Link>
             <h1 className="mt-1 font-display text-[34px] font-semibold leading-[1.02] md:text-[42px]">{p.name}</h1>
             <p className="mt-3 text-[16px] text-ink-2">{p.short}</p>
             <ul className="mt-4 space-y-1.5 text-sm">

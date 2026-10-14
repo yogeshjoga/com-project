@@ -12,6 +12,7 @@ export { discountPct };
 /** Cache tags. CRM server actions and checkout call updateTag() with these. */
 export const TAG_CATALOG = "shop-catalog";
 export const TAG_ANNOUNCEMENTS = "shop-announcements";
+export const TAG_BRANDS = "shop-brands";
 
 const ART: ArtKind[] = ["quad", "whoop", "wing", "camdrone", "goggles", "airunit", "fpvcam", "antenna", "frame", "motor", "esc", "board", "prop", "gps", "radio", "receiver", "battery", "charger", "cable", "actioncam", "gimbal", "meter", "iron", "tool", "bag"];
 const TAGS: Tag[] = ["hot", "new", "bestseller", "made-in-india"];
@@ -157,11 +158,35 @@ export function brandSlug(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
+export interface BrandInfo {
+  slug: string;
+  name: string;
+  logoUrl: string | null;
+  website: string | null;
+}
+
+/** Brand logos and links managed from the CRM (shop_brands). */
+export async function getBrandInfo(): Promise<Record<string, BrandInfo>> {
+  "use cache";
+  cacheTag(TAG_BRANDS);
+  cacheLife("minutes");
+  if (!supabaseConfigured) return {};
+  const { data, error } = await publicClient().from("shop_brands").select("slug, name, logo_url, website");
+  if (error) throw new Error(`Brand read failed: ${error.message}`);
+  return Object.fromEntries(
+    (data ?? []).map((b) => [b.slug, { slug: b.slug, name: b.name, logoUrl: b.logo_url, website: b.website }]),
+  );
+}
+
 export async function brands() {
+  const [summaries, info] = await Promise.all([getSummaries(), getBrandInfo()]);
   const counts = new Map<string, number>();
-  for (const p of await getSummaries()) counts.set(p.brand, (counts.get(p.brand) ?? 0) + 1);
+  for (const p of summaries) counts.set(p.brand, (counts.get(p.brand) ?? 0) + 1);
   return [...counts.entries()]
-    .map(([name, count]) => ({ name, slug: brandSlug(name), count }))
+    .map(([name, count]) => {
+      const slug = brandSlug(name);
+      return { name, slug, count, logoUrl: info[slug]?.logoUrl ?? null, website: info[slug]?.website ?? null };
+    })
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 }
 

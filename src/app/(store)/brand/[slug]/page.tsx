@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { brands, productsByBrand } from "@/lib/catalog";
 import { PageHead } from "@/components/PageHead";
 import { Listing } from "@/components/Listing";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export async function generateStaticParams() {
   return (await brands()).map((b) => ({ slug: b.slug }));
@@ -20,7 +21,21 @@ export default async function BrandPage({ params }: PageProps<"/brand/[slug]">) 
   if (!b) notFound();
   return (
     <>
-      <PageHead title={b.name} blurb={`Genuine ${b.name} products with GST invoice.`} crumbs={[{ label: "Brands", href: "/brands" }, { label: b.name }]} />
+      <PageHead title={b.name} blurb={`${b.name} products in stock at EgireRobotics, with a GST invoice on every order.`} crumbs={[{ label: "Brands", href: "/brands" }, { label: b.name }]} />
+      {b.logoUrl || b.website ? (
+        <div className="mx-auto -mt-2 mb-6 flex max-w-7xl flex-wrap items-center gap-4 px-4">
+          {b.logoUrl ? (
+            <div className="flex h-20 w-56 items-center rounded-lg border border-line bg-white px-5">
+              <BrandLogo name={b.name} logoUrl={b.logoUrl} className="h-11" sizes="224px" />
+            </div>
+          ) : null}
+          {b.website ? (
+            <a href={b.website} target="_blank" rel="noopener nofollow" className="text-sm text-signal-ink hover:underline">
+              Official {b.name} website
+            </a>
+          ) : null}
+        </div>
+      ) : null}
       <div className="mx-auto max-w-7xl px-4">
         <Listing items={await productsByBrand(slug)} />
       </div>
