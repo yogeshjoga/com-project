@@ -41,7 +41,14 @@ const TITLE_RULES: [RegExp, string][] = [
   [/\b(gimbal camera|camera gimbal|3-axis gimbal|gimbal cam)\b/, "gimbal-cameras"],
   [/\bgoggle/, "goggles"],
   [/\b(vtol|fixed.?wing|flying wing|airplane|plane|glider|wingspan)\b/, "vtol-fixed-wing"],
-  [/\b(whoop|cinewhoop|tiny ?hawk|meteor\d*|air\d{2}|mobula|cetus|pavo\d*|toothpick)\b/, "whoops-micro"],
+  // Parts named after a drone model ("Nazgul5 frame", "Mobula8 motor") are parts, not drones.
+  [/\bframe( kit)?\b/, "frames"],
+  [/\bmotors?\b/, "motors"],
+  [/\b(props?|propellers?)\b/, "propellers"],
+  [/\b(whoop|cinewhoop|tiny ?hawk|meteor\d*|air\d{2}|mobula|cetus|pavo\d*|toothpick|alpha a\d{2}|bumblebee)\b/, "whoops-micro"],
+  // iFlight drone families (their titles rarely say "drone").
+  [/\b(nazgul\w*|evoque|chimera\w*|protek\w*|defender|cidora|helion|taurus|titan|mach r\d|commander|aos)\b/, "fpv-drones"],
+  [/\bxing\w*\b/, "motors"],
   [/\b(bnf|pnp|rtf|ready to fly|fpv drone|freestyle drone|racing drone|quadcopter|cinelifter|drone kit)\b/, "fpv-drones"],
   [/\b(radio controller|transmitter|literadio)\b/, "radios"],
   [/\b(tx module|elrs module|crossfire tx|telemetry)\b/, "long-range"],

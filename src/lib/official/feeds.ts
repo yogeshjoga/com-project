@@ -36,7 +36,7 @@ export const SOURCES: Source[] = [
 ];
 
 export interface OfficialItem {
-  source: "shopify" | "woocommerce";
+  source: "shopify" | "woocommerce" | "html";
   source_key: string;
   source_url: string;
   sku: string;
@@ -68,7 +68,7 @@ const CANON: Record<string, string> = { "hq prop": "HQProp", "team blacksheep": 
 const BRAND_RES = KNOWN_BRANDS.map((b) => ({ b, re: new RegExp(`^${b.replace(/[-\s]/g, "[-\\s]?")}\\b`, "i") }));
 
 /** Real brand of a listing: the title's leading brand if it's a different known brand, else the store's. */
-function brandOf(storeBrand: string, title: string) {
+export function brandOf(storeBrand: string, title: string) {
   const t = decode(title).trim();
   const hit = BRAND_RES.find(({ re }) => re.test(t));
   if (!hit) return storeBrand;
@@ -76,14 +76,14 @@ function brandOf(storeBrand: string, title: string) {
   return canon.toLowerCase() === storeBrand.toLowerCase() ? storeBrand : canon;
 }
 
-const UA = { "user-agent": "EgireShopCatalogSync/1.0 (+https://egirerobotics.com; contact@egirerobotics.com)" };
+export const UA = { "user-agent": "EgireShopCatalogSync/1.0 (+https://egirerobotics.com; contact@egirerobotics.com)" };
 const SKIP = /gift ?card|e-?gift|insurance|shipping|deposit|coupon|voucher|custom payment|payment link|donation|price difference|extra fee|test product|sample order|warranty service|repair service|\bservice\b/i;
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-const slugify = (s: string) =>
+export const slugify = (s: string) =>
   s.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 90).replace(/-$/, "");
-const clip = (s: string, n: number) => (s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s);
-const decode = (s: string) =>
+export const clip = (s: string, n: number) => (s.length > n ? s.slice(0, n - 1).trimEnd() + "…" : s);
+export const decode = (s: string) =>
   s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#0?39;|&#8217;|&rsquo;/g, "’").replace(/&#8243;/g, "″")
     .replace(/&#8211;|&ndash;/g, "–").replace(/&#8212;|&mdash;/g, "—").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;|&#160;/g, " ");
 
@@ -97,7 +97,9 @@ export function cleanDescription(html: string) {
   })
     .replace(/(<br \/>\s*){3,}/g, "<br /><br />")
     .trim()
-    .slice(0, 60000);
+    .slice(0, 60000)
+    // Store platforms' untouched placeholder text is not a description.
+    .replace(/^(<p>)?\s*type a description for this product here\.*\s*(<\/p>)?$/i, "");
 }
 
 const textOf = (html: string) => decode(sanitizeHtml(html ?? "", { allowedTags: [], allowedAttributes: {} })).replace(/\s+/g, " ").trim();
@@ -105,7 +107,7 @@ const textOf = (html: string) => decode(sanitizeHtml(html ?? "", { allowedTags: 
 // Boilerplate that makes a poor product summary.
 const BOILERPLATE = /^(summary|description|overview|features?|specifications?|country of origin|warranty|download|note|attention|package|what'?s in the box)\b/i;
 
-function summary(descHtml: string, shortHtml?: string) {
+export function summary(descHtml: string, shortHtml?: string) {
   const s = textOf(shortHtml ?? "").replace(/^summary\s*/i, "");
   if (s.length >= 20 && !BOILERPLATE.test(s)) return clip(s, 280);
   // First real sentences from the description, skipping headings and boilerplate lines.
@@ -115,7 +117,7 @@ function summary(descHtml: string, shortHtml?: string) {
   return clip(first || text, 280);
 }
 
-function displayName(brand: string, title: string) {
+export function displayName(brand: string, title: string) {
   const t = decode(title).replace(/\s+/g, " ").trim();
   return clip(new RegExp(`^${brand}\\b`, "i").test(t) ? t : `${brand} ${t}`, 200);
 }

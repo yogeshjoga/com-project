@@ -35,7 +35,14 @@ Run or refresh the sync (safe to repeat; add brand names to limit it, or `--dry`
 npx tsx --env-file=.env.local scripts/sync-official.mts
 ```
 
-Brands without a public feed (iFlight, SpeedyBee, Matek, Happymodel, TBS, RunCam, DJI and others) need a per-site importer; see `src/lib/official/feeds.ts`.
+Brands without a feed are imported from their product pages (sitemaps or category pages, robots.txt-allowed URLs only; structured data plus the page's description section), in `src/lib/official/html-sources.ts`:
+
+- **iFlight:** sitemap → product structured data and description. iFlight's image CDN blocks other websites, so its photos aren't hotlinked; admins add photos from iFlight's dealer media kit with the CRM's "Add photo".
+- **SpeedyBee:** product sitemap → page HTML, including single-group options.
+- **T-Motor:** category pages → product pages, with the full spec table imported as specs.
+- **Matek:** not imported. Its website refuses automated access.
+
+Brands still without an importer: Happymodel (bot-protected), TBS, RunCam, DJI, GoPro, Insta360 and others.
 
 ## Payments (Razorpay)
 

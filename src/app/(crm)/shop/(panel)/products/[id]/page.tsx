@@ -55,6 +55,7 @@ async function Editor({ params, searchParams }: Pick<PageProps<"/shop/products/[
           initial={{
             id: p.id, category: p.category, short: p.short ?? "", tags: p.tags ?? [], low_stock_at: String(p.low_stock_at),
             is_published: p.is_published,
+            image_url: p.image_url ?? null,
             price: String(p.price || ""), mrp: p.mrp == null ? "" : String(p.mrp), stock: String(p.stock),
             variants: (variants as V[]).map((v) => ({ id: v.id, price: String(v.price || ""), mrp: v.mrp == null ? "" : String(v.mrp), stock: String(v.stock) })),
           }}

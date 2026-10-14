@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { categories, departments } from "@/data/categories";
 import type { ArtKind } from "@/lib/types";
 import { ProductMedia } from "@/components/ProductMedia";
+import { browserClient } from "@/lib/supabase/browser";
 import { saveOfficialProduct, type OfficialEdit } from "@/app/(crm)/shop/actions";
 import { inputCls } from "./ui";
 
@@ -38,10 +39,23 @@ export function OfficialProductForm({ product, initial }: { product: OfficialPro
   const [f, setF] = useState<OfficialEdit>(initial);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, start] = useTransition();
+  const [uploading, setUploading] = useState(false);
   const hasVariants = Boolean(product.variants.length);
   const set = <K extends keyof OfficialEdit>(k: K, v: OfficialEdit[K]) => { setMsg(null); setF((x) => ({ ...x, [k]: v })); };
   const setVar = (id: string, patch: Partial<NonNullable<OfficialEdit["variants"]>[number]>) =>
     set("variants", (f.variants ?? []).map((v) => (v.id === id ? { ...v, ...patch } : v)));
+
+  async function upload(file: File) {
+    if (!/^image\/(png|jpe?g|webp)$/.test(file.type)) return setMsg({ ok: false, text: "Upload a PNG, JPG or WebP image." });
+    if (file.size > 3 * 1024 * 1024) return setMsg({ ok: false, text: "Images must be 3 MB or smaller." });
+    setUploading(true);
+    const path = `shop/${crypto.randomUUID()}.${file.type.split("/")[1].replace("jpeg", "jpg")}`;
+    const sb = browserClient();
+    const { error } = await sb.storage.from("site-media").upload(path, file, { cacheControl: "31536000", contentType: file.type });
+    setUploading(false);
+    if (error) return setMsg({ ok: false, text: `Upload failed: ${error.message}` });
+    set("image_url", sb.storage.from("site-media").getPublicUrl(path).data.publicUrl);
+  }
 
   function save(e: React.FormEvent) {
     e.preventDefault();
@@ -113,6 +127,24 @@ export function OfficialProductForm({ product, initial }: { product: OfficialPro
             Name, photos, description and options come from the brand and refresh on every sync{product.syncedAt ? ` (last ${new Date(product.syncedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })})` : ""}.
             {product.sourceUrl ? <> <a href={product.sourceUrl} target="_blank" rel="noopener" className="text-signal-ink hover:underline">View on {product.brand}’s site</a></> : null}
           </p>
+          {!product.images.length ? (
+            <div className="mt-4 rounded-md bg-[#fdf6e3] p-4 text-sm">
+              <p className="font-medium">{product.brand} doesn’t allow its photos to be shown on other websites.</p>
+              <p className="mt-1 text-ink-2">Upload a product photo from {product.brand}’s dealer media kit. It’s shown until the brand’s own photos become available.</p>
+              <div className="mt-3 flex items-center gap-3">
+                {f.image_url ? (
+                  <span className="size-20 overflow-hidden rounded-md bg-white ring-1 ring-line">
+                    <ProductMedia imageUrl={f.image_url} art={product.art} hue={210} alt="" sizes="80px" className="size-full p-1" />
+                  </span>
+                ) : null}
+                <label className="cursor-pointer rounded-md bg-white px-3 py-1.5 font-medium ring-1 ring-line hover:ring-ink">
+                  {uploading ? "Uploading…" : f.image_url ? "Replace photo" : "Add photo"}
+                  <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" disabled={uploading} onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
+                </label>
+                {f.image_url ? <button type="button" onClick={() => set("image_url", null)} className="text-muted hover:text-danger">Remove</button> : null}
+              </div>
+            </div>
+          ) : null}
           {product.images.length ? (
             <ul className="mt-4 flex flex-wrap gap-2">
               {product.images.map((src) => (
@@ -160,7 +192,7 @@ export function OfficialProductForm({ product, initial }: { product: OfficialPro
           <p className="mt-1 text-xs text-muted">Needs a price first.</p>
         </section>
         {msg ? <p role={msg.ok ? "status" : "alert"} className={`rounded-md p-3 text-sm ${msg.ok ? "bg-[#e6f6ef] text-go" : "bg-[#fdecea] text-danger"}`}>{msg.text}</p> : null}
-        <button type="submit" disabled={pending} className="h-11 w-full rounded-md bg-signal font-semibold text-ink hover:bg-signal-hover disabled:opacity-60">
+        <button type="submit" disabled={pending || uploading} className="h-11 w-full rounded-md bg-signal font-semibold text-ink hover:bg-signal-hover disabled:opacity-60">
           {pending ? "Saving…" : "Save changes"}
         </button>
       </aside>

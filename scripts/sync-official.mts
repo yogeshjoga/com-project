@@ -7,6 +7,7 @@
 //   add --dry to fetch and report without writing
 import { createClient } from "@supabase/supabase-js";
 import { SOURCES, fetchSource, type OfficialItem } from "../src/lib/official/feeds";
+import { HTML_SOURCES, fetchHtmlSource } from "../src/lib/official/html-sources";
 
 const args = process.argv.slice(2);
 const dry = args.includes("--dry");
@@ -26,7 +27,11 @@ function dedupeSlugs(items: OfficialItem[], taken: Set<string>) {
   }
 }
 
-const sources = SOURCES.filter((s) => !only.length || only.includes(s.brand.toLowerCase()));
+// Feed brands (Shopify / WooCommerce) and page-based brands (iFlight, SpeedyBee, T-Motor) share one pipeline.
+const sources = [
+  ...SOURCES.map((s) => ({ brand: s.brand, fetch: (log: (m: string) => void) => fetchSource(s, log) })),
+  ...HTML_SOURCES.map((s) => ({ brand: s.brand, fetch: (log: (m: string) => void) => fetchHtmlSource(s, log) })),
+].filter((s) => !only.length || only.includes(s.brand.toLowerCase()));
 const takenSlugs = new Set<string>();
 const totals = { inserted: 0, updated: 0, products: 0 };
 const byCategory: Record<string, number> = {};
@@ -34,7 +39,7 @@ const byCategory: Record<string, number> = {};
 for (const src of sources) {
   let items: OfficialItem[];
   try {
-    items = await fetchSource(src, (m) => console.log(m));
+    items = await src.fetch((m) => console.log(m));
   } catch (e) {
     console.error(`${src.brand}: FAILED to fetch (${(e as Error).message}). Skipping.`);
     continue;

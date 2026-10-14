@@ -129,6 +129,8 @@ export interface OfficialEdit {
   tags: string[];
   low_stock_at: number | string;
   is_published: boolean;
+  /** Our own photo, for official products whose brand doesn't allow its photos on other sites. */
+  image_url?: string | null;
   /** Simple product (no options). */
   price?: number | string;
   mrp?: number | string | null;
@@ -156,6 +158,11 @@ export async function saveOfficialProduct(input: OfficialEdit): Promise<ActionRe
       tags: input.tags,
       low_stock_at: int(input.low_stock_at),
     };
+    if (input.image_url !== undefined) {
+      const img = input.image_url?.trim() || null;
+      if (img && !/^https:\/\//.test(img)) throw new Error("Invalid photo URL.");
+      row.image_url = img;
+    }
     if (variants.length) {
       row.price = priced.length ? Math.min(...priced) : 0;
     } else {

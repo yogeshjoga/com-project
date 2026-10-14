@@ -8,6 +8,8 @@ import Image, { type ImageLoaderProps } from "next/image";
  */
 function brandCdnLoader({ src, width }: ImageLoaderProps) {
   if (/cdn\.shopify\.com|\/cdn\/shop\//.test(src)) return `${src}${src.includes("?") ? "&" : "?"}width=${width}`;
+  // BigCommerce (SpeedyBee) serves any size from its /stencil/{w}x{h}/ path.
+  if (/bigcommerce\.com\/.+\/stencil\/\d+x\d+\//.test(src)) return src.replace(/\/stencil\/\d+x\d+\//, `/stencil/${width}x${width}/`);
   return src;
 }
 
