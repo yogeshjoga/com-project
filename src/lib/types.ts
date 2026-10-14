@@ -55,6 +55,12 @@ export interface Product {
   variant?: { name: string; options: VariantOption[] };
   weightG?: number;
   imageUrl?: string;
+  /** Official photo gallery (first is the main image). */
+  images: string[];
+  /** Official description, sanitised HTML. */
+  descriptionHtml?: string;
+  /** Brand's own product page, for official products. */
+  sourceUrl?: string;
   lowStockAt: number;
   addedOrder: number;
 }

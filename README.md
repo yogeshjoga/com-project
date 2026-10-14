@@ -21,6 +21,22 @@ npm run dev                  # http://localhost:3000
 
 **Speed:** catalog pages are prerendered and cached (`use cache`, `cacheLife('minutes')`). CRM edits and orders call `updateTag()`, so the store shows changes within seconds without losing the static speed.
 
+## Official catalog (brand sync)
+
+About 3,200 products are imported from the brands' own stores with their official photos, descriptions and options: BetaFPV, RadioMaster, CNHL, Caddx/Walksnail, HGLRC, Heewing, Holybro, Diatone, Zerodrag, NewBeeDrone (Shopify feeds), plus GEPRC, ToolkitRC and Pine64 (WooCommerce Store API). They arrive as **hidden drafts**. A product goes live when an admin sets its price and stock in the CRM and switches it on.
+
+- **Locked:** name, brand, photos, description, specs and option names are enforced by a database trigger and change only through the sync.
+- **Admin-owned:** price, MRP and stock (per option), store summary, category, labels, low-stock level and publishing. Re-syncs never touch them.
+- **Rules:** nothing can be published without a price, and no option can hold stock without a price. Options without a price stay hidden from customers.
+
+Run or refresh the sync (safe to repeat; add brand names to limit it, or `--dry` to preview):
+
+```bash
+npx tsx --env-file=.env.local scripts/sync-official.mts
+```
+
+Brands without a public feed (iFlight, SpeedyBee, Matek, Happymodel, TBS, RunCam, DJI and others) need a per-site importer; see `src/lib/official/feeds.ts`.
+
 ## Payments (Razorpay)
 
 Customers choose **Pay online** (UPI, cards, net banking, wallets via Razorpay Checkout) or **Cash on delivery**.

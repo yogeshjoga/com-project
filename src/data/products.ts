@@ -713,6 +713,7 @@ export const products: Product[] = seeds.map((s, i) => {
     id: `p${String(i + 1).padStart(3, "0")}`,
     sku: `EG-${String(i + 1).padStart(4, "0")}`,
     lowStockAt: 5,
+    images: [],
     slug: slugify(s.name),
     name: s.name,
     brand: s.brand,

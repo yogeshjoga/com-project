@@ -29,6 +29,7 @@ export const categories: Category[] = [
   { slug: "flight-controllers", name: "Flight controllers", department: "parts", art: "board", blurb: "F4, F7 and H7 flight controllers and stacks for Betaflight, iNav and ArduPilot." },
   { slug: "propellers", name: "Propellers", department: "parts", art: "prop", blurb: "Props for whoops, 5 inch freestyle, long range and heavy lift." },
   { slug: "gps-sensors", name: "GPS & sensors", department: "parts", art: "gps", blurb: "GNSS modules, compasses, airspeed and rangefinders." },
+  { slug: "accessories", name: "Accessories & spares", department: "parts", art: "tool", blurb: "Spare parts, mounts, straps, canopies and upgrades." },
 
   { slug: "radios", name: "Radio controllers", department: "radio", art: "radio", blurb: "ELRS, Crossfire and multi-protocol transmitters." },
   { slug: "receivers", name: "Receivers", department: "radio", art: "receiver", blurb: "ExpressLRS, TBS and Ghost receivers in every size." },

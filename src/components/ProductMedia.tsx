@@ -1,8 +1,9 @@
 import Image from "next/image";
 import type { ArtKind } from "@/lib/types";
 import { ProductArt } from "./ProductArt";
+import { RemoteImage } from "./RemoteImage";
 
-/** Product photo uploaded from the CRM, or the built-in line art when there is none. */
+/** Product photo (official brand image or CRM upload), or the built-in line art when there is none. */
 export function ProductMedia({
   imageUrl,
   art,
@@ -21,10 +22,16 @@ export function ProductMedia({
   priority?: boolean;
 }) {
   if (!imageUrl) return <ProductArt kind={art} hue={hue} className={className} />;
+  // Photos uploaded in the CRM (our Supabase storage) go through Next's optimiser; brand CDN photos load directly.
+  const ours = imageUrl.includes(".supabase.co/storage/");
   return (
     <div className={className}>
       <div className="relative size-full">
-        <Image src={imageUrl} alt={alt} fill sizes={sizes} priority={priority} className="object-contain" />
+        {ours ? (
+          <Image src={imageUrl} alt={alt} fill sizes={sizes} priority={priority} className="object-contain" />
+        ) : (
+          <RemoteImage src={imageUrl} alt={alt} sizes={sizes} priority={priority} className="object-contain" />
+        )}
       </div>
     </div>
   );

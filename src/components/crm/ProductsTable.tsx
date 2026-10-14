@@ -20,7 +20,7 @@ export interface AdminProductRow {
   low_stock_at: number;
   is_published: boolean;
   variant_name: string | null;
-  image_url: string | null;
+  source: string;
   shop_product_variants: { id: string; label: string; price: number; stock: number; sort: number }[];
 }
 
@@ -29,16 +29,23 @@ const totalStock = (r: AdminProductRow) =>
 
 const filters = [
   { key: "all", label: "All" },
+  { key: "live", label: "Live" },
+  { key: "unpriced", label: "Needs price" },
   { key: "low", label: "Low stock" },
   { key: "out", label: "Out of stock" },
   { key: "hidden", label: "Hidden" },
 ];
 
+const PAGE = 50;
+
 export function ProductsTable({ rows, initialFilter }: { rows: AdminProductRow[]; initialFilter: string }) {
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState(filters.some((f) => f.key === initialFilter) ? initialFilter : "all");
   const [cat, setCat] = useState("");
+  const [brand, setBrand] = useState("");
+  const [page, setPage] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
+  const brands = useMemo(() => [...new Set(rows.map((r) => r.brand))].sort((a, b) => a.localeCompare(b)), [rows]);
 
   const shown = useMemo(() => {
     const words = q.toLowerCase().split(/\s+/).filter(Boolean);
@@ -46,13 +53,20 @@ export function ProductsTable({ rows, initialFilter }: { rows: AdminProductRow[]
       const hay = `${r.name} ${r.brand} ${r.sku}`.toLowerCase();
       if (words.some((w) => !hay.includes(w))) return false;
       if (cat && r.category !== cat) return false;
+      if (brand && r.brand !== brand) return false;
       const s = totalStock(r);
+      if (filter === "live") return r.is_published;
+      if (filter === "unpriced") return !r.price;
       if (filter === "low") return r.is_published && s <= r.low_stock_at;
       if (filter === "out") return s === 0;
       if (filter === "hidden") return !r.is_published;
       return true;
     });
-  }, [rows, q, cat, filter]);
+  }, [rows, q, cat, brand, filter]);
+  const pages = Math.max(1, Math.ceil(shown.length / PAGE));
+  const current = Math.min(page, pages - 1);
+  const visible = shown.slice(current * PAGE, current * PAGE + PAGE);
+  const counts = useMemo(() => ({ unpriced: rows.filter((r) => !r.price).length, live: rows.filter((r) => r.is_published).length }), [rows]);
 
   function notify(msg: string) {
     setToast(msg);
@@ -62,8 +76,12 @@ export function ProductsTable({ rows, initialFilter }: { rows: AdminProductRow[]
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, brand or SKU" aria-label="Search products" className={`${inputCls} max-w-xs`} />
-        <select value={cat} onChange={(e) => setCat(e.target.value)} aria-label="Category" className={`${inputCls} w-auto`}>
+        <input value={q} onChange={(e) => { setQ(e.target.value); setPage(0); }} placeholder="Search name, brand or SKU" aria-label="Search products" className={`${inputCls} max-w-xs`} />
+        <select value={brand} onChange={(e) => { setBrand(e.target.value); setPage(0); }} aria-label="Brand" className={`${inputCls} w-auto`}>
+          <option value="">All brands</option>
+          {brands.map((b) => <option key={b} value={b}>{b}</option>)}
+        </select>
+        <select value={cat} onChange={(e) => { setCat(e.target.value); setPage(0); }} aria-label="Category" className={`${inputCls} w-auto`}>
           <option value="">All categories</option>
           {categories.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
         </select>
@@ -73,10 +91,11 @@ export function ProductsTable({ rows, initialFilter }: { rows: AdminProductRow[]
               key={f.key}
               type="button"
               aria-pressed={filter === f.key}
-              onClick={() => setFilter(f.key)}
+              onClick={() => { setFilter(f.key); setPage(0); }}
               className={`rounded-full px-3 py-1.5 text-sm ${filter === f.key ? "bg-ink text-white" : "bg-white ring-1 ring-line hover:ring-ink"}`}
             >
               {f.label}
+              {f.key === "unpriced" ? ` (${counts.unpriced})` : f.key === "live" ? ` (${counts.live})` : ""}
             </button>
           ))}
         </div>
@@ -96,11 +115,19 @@ export function ProductsTable({ rows, initialFilter }: { rows: AdminProductRow[]
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
-            {shown.map((r) => <Row key={r.id} r={r} notify={notify} />)}
+            {visible.map((r) => <Row key={r.id} r={r} notify={notify} />)}
           </tbody>
         </table>
         {shown.length === 0 ? <p className="p-8 text-center text-sm text-muted">No products match. Clear the search or pick another filter.</p> : null}
       </div>
+
+      {pages > 1 ? (
+        <nav aria-label="Pages" className="mt-4 flex items-center justify-between text-sm">
+          <button type="button" disabled={current === 0} onClick={() => setPage(current - 1)} className="rounded-md px-3 py-1.5 ring-1 ring-line disabled:opacity-40">Previous</button>
+          <span className="text-muted tabular">Page {current + 1} of {pages}, showing {current * PAGE + 1}–{Math.min(shown.length, current * PAGE + PAGE)} of {shown.length}</span>
+          <button type="button" disabled={current >= pages - 1} onClick={() => setPage(current + 1)} className="rounded-md px-3 py-1.5 ring-1 ring-line disabled:opacity-40">Next</button>
+        </nav>
+      ) : null}
 
       {toast ? (
         <div role="status" className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-md bg-ink px-4 py-2.5 text-sm text-white shadow-lg">{toast}</div>
@@ -130,10 +157,14 @@ function Row({ r, notify }: { r: AdminProductRow; notify: (m: string) => void })
     <tr className={`align-top ${pending ? "opacity-60" : ""}`}>
       <td className="px-4 py-3">
         <Link href={`/shop/products/${r.id}`} className="font-medium hover:underline">{r.name}</Link>
-        <p className="text-xs text-muted">{r.brand}, SKU {r.sku}</p>
+        <p className="text-xs text-muted">
+          {r.brand}, SKU {r.sku}
+          {r.source !== "manual" ? <span className="ml-2 rounded bg-[#e8f1fb] px-1.5 py-0.5 text-[11px] font-medium text-chart">Official</span> : null}
+          {!r.price ? <span className="ml-2 rounded bg-[#fdf6e3] px-1.5 py-0.5 text-[11px] font-medium text-signal-ink">Needs price</span> : null}
+        </p>
       </td>
       <td className="px-3 py-3 text-muted">{categoryBySlug.get(r.category)?.name ?? r.category}</td>
-      <td className="px-3 py-3 text-right tabular">{formatINR(variants.length ? Math.min(...variants.map((v) => v.price)) : r.price)}</td>
+      <td className="px-3 py-3 text-right tabular">{r.price ? formatINR(r.price) : <span className="text-muted">Not set</span>}</td>
       <td className="px-3 py-3">
         {variants.length ? (
           <div className="space-y-1.5">
@@ -162,7 +193,7 @@ function Row({ r, notify }: { r: AdminProductRow; notify: (m: string) => void })
       <td className="whitespace-nowrap px-4 py-3 text-right">
         <Link href={`/shop/products/${r.id}`} className="text-signal-ink hover:underline">Edit</Link>
         <a href={`/product/${r.slug}`} target="_blank" rel="noopener" className="ml-3 text-muted hover:text-ink">View</a>
-        <button
+        {r.source === "manual" ? <button
           type="button"
           onClick={() => {
             if (window.confirm(`Delete “${r.name}” permanently? Past orders keep their line items. To take it off the store for now, use the On store switch instead.`)) {
@@ -172,7 +203,7 @@ function Row({ r, notify }: { r: AdminProductRow; notify: (m: string) => void })
           className="ml-3 text-danger hover:underline"
         >
           Delete
-        </button>
+        </button> : null}
       </td>
     </tr>
   );

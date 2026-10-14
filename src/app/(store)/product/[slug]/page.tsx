@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { brand } from "@/config/brand";
 import { categoryBySlug, departmentBySlug } from "@/data/categories";
-import { brandSlug, getBrandInfo, getProduct, getProducts, related } from "@/lib/catalog";
+import { brandSlug, getBrandInfo, getProduct, getProductDescription, getProducts, related } from "@/lib/catalog";
 import { BrandLogo } from "@/components/BrandLogo";
-import { ProductMedia } from "@/components/ProductMedia";
+import { ProductGallery } from "@/components/ProductGallery";
 import { BuyBox } from "@/components/BuyBox";
 import { Breadcrumbs, Section } from "@/components/Section";
 import { ProductRail } from "@/components/ProductCard";
@@ -28,6 +28,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
   const brandInfo = (await getBrandInfo())[brandSlug(p.brand)];
   const brandLogo = brandInfo?.logoUrl;
   const d = departmentBySlug.get(c.department)!;
+  const description = await getProductDescription(p.slug);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -36,6 +37,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
     brand: { "@type": "Brand", name: p.brand },
     description: p.short,
     sku: p.sku,
+    image: p.images.length ? p.images.slice(0, 4) : undefined,
     offers: {
       "@type": "Offer",
       priceCurrency: "INR",
@@ -62,9 +64,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
 
         <div className="mt-5 grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
           <div className="lg:sticky lg:top-40 lg:self-start">
-            <div className="aspect-[16/10] overflow-hidden rounded-lg bg-white ring-1 ring-line sm:aspect-[4/3]">
-              <ProductMedia imageUrl={p.imageUrl} art={p.art} hue={p.hue} alt={p.name} priority className="size-full p-[8%]" />
-            </div>
+            <ProductGallery images={p.images} name={p.name} art={p.art} hue={p.hue} />
           </div>
 
           <div>
@@ -75,7 +75,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
               <span className={brandLogo ? "sr-only" : ""}>{p.brand}</span>
             </Link>
             <h1 className="mt-1 font-display text-[34px] font-semibold leading-[1.02] md:text-[42px]">{p.name}</h1>
-            <p className="mt-3 text-[16px] text-ink-2">{p.short}</p>
+            {p.short ? <p className="mt-3 text-[16px] text-ink-2">{p.short}</p> : null}
             <ul className="mt-4 space-y-1.5 text-sm">
               {p.highlights.map((h) => (
                 <li key={h} className="flex gap-2"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-signal" aria-hidden="true" />{h}</li>
@@ -93,6 +93,21 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
             </ul>
           </div>
         </div>
+
+        {description ? (
+          <section className="mt-12" aria-labelledby="product-description">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h2 id="product-description" className="font-display text-[28px] font-semibold">Description</h2>
+              {p.sourceUrl ? (
+                <a href={p.sourceUrl} target="_blank" rel="noopener nofollow" className="text-sm text-signal-ink hover:underline">
+                  Official {p.brand} product page
+                </a>
+              ) : null}
+            </div>
+            {/* Official description from the brand, sanitised at import (structural tags only). */}
+            <div className="official-desc mt-3 rounded-lg bg-white p-5 ring-1 ring-line md:p-8" dangerouslySetInnerHTML={{ __html: description }} />
+          </section>
+        ) : null}
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
           <section>

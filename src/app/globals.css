@@ -119,3 +119,29 @@ body {
     opacity: 1;
   }
 }
+
+/* Official product descriptions (sanitised to structural HTML at import). */
+.official-desc {
+  max-width: 78ch;
+  color: var(--ink-2);
+  line-height: 1.65;
+}
+.official-desc > * + * { margin-top: 0.85em; }
+.official-desc h2, .official-desc h3, .official-desc h4, .official-desc h5 {
+  font-family: var(--font-barlow), var(--font-plex), sans-serif;
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.15;
+  margin-top: 1.4em;
+}
+.official-desc h2 { font-size: 1.6rem; }
+.official-desc h3 { font-size: 1.35rem; }
+.official-desc h4, .official-desc h5 { font-size: 1.15rem; }
+.official-desc ul { list-style: disc; padding-left: 1.25rem; }
+.official-desc ol { list-style: decimal; padding-left: 1.25rem; }
+.official-desc li + li { margin-top: 0.3em; }
+.official-desc strong { color: var(--ink); font-weight: 600; }
+.official-desc table { width: 100%; border-collapse: collapse; font-size: 0.92em; display: block; overflow-x: auto; }
+.official-desc th, .official-desc td { border: 1px solid var(--line); padding: 0.45em 0.7em; text-align: left; vertical-align: top; }
+.official-desc th { background: var(--paper); color: var(--ink); font-weight: 600; }
+.official-desc blockquote { border-left: 3px solid var(--signal); padding-left: 1em; }

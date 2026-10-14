@@ -28,12 +28,14 @@ interface Row {
   price: number; mrp: number | null; stock: number; low_stock_at: number; art: string; tags: string[];
   short: string; highlights: string[]; specs: Record<string, string>; in_box: string[] | null;
   variant_name: string | null; image_url: string | null; weight_g: number | null; sort: number; created_at: string;
+  images: string[]; description_html?: string | null; source_url: string | null;
   shop_product_variants: { id: string; label: string; price: number; mrp: number | null; stock: number; sort: number }[];
 }
 
 function fromRow(r: Row, addedOrder: number): Product {
+  // Only options an admin has priced are offered.
   const opts = r.variant_name
-    ? [...r.shop_product_variants].sort((a, b) => a.sort - b.sort).map((v) => ({
+    ? [...r.shop_product_variants].filter((v) => v.price > 0).sort((a, b) => a.sort - b.sort).map((v) => ({
         id: v.id, label: v.label, price: v.price, mrp: v.mrp ?? undefined, stock: v.stock,
       }))
     : undefined;
@@ -60,7 +62,10 @@ function fromRow(r: Row, addedOrder: number): Product {
     inBox: r.in_box ?? undefined,
     variant: hasOpts ? { name: r.variant_name!, options: opts! } : undefined,
     weightG: r.weight_g ?? undefined,
-    imageUrl: r.image_url ?? undefined,
+    imageUrl: r.images?.[0] ?? r.image_url ?? undefined,
+    images: r.images?.length ? r.images : r.image_url ? [r.image_url] : [],
+    descriptionHtml: r.description_html ?? undefined,
+    sourceUrl: r.source_url ?? undefined,
     addedOrder,
   };
 }
@@ -72,16 +77,41 @@ export async function getProducts(): Promise<Product[]> {
   cacheLife("minutes");
   if (!supabaseConfigured) return sampleProducts;
 
+  // The API returns at most 1,000 rows per request, so page through the published catalog.
+  // Descriptions are loaded per product page (getProductDescription) to keep this cache entry small.
+  const rows: Row[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await publicClient()
+      .from("shop_products")
+      .select("id, sku, slug, name, brand, category, price, mrp, stock, low_stock_at, art, tags, short, highlights, specs, in_box, variant_name, image_url, images, source_url, weight_g, sort, created_at, shop_product_variants(id, label, price, mrp, stock, sort)")
+      .eq("is_published", true)
+      .order("created_at", { ascending: false })
+      .order("sort", { ascending: true })
+      .order("id", { ascending: true })
+      .range(from, from + 999);
+    // Fail loudly: serving sample data would show wrong stock and break checkout.
+    // The previous cached catalog keeps serving while this retries.
+    if (error) throw new Error(`Catalog read failed: ${error.message}`);
+    rows.push(...(data as unknown as Row[]));
+    if (!data || data.length < 1000) break;
+  }
+  return rows.map((r, i) => fromRow(r, i));
+}
+
+/** Official description for one product (sanitised HTML at import time). */
+export async function getProductDescription(slug: string): Promise<string | null> {
+  "use cache";
+  cacheTag(TAG_CATALOG, `product-${slug}`);
+  cacheLife("minutes");
+  if (!supabaseConfigured) return null;
   const { data, error } = await publicClient()
     .from("shop_products")
-    .select("id, sku, slug, name, brand, category, price, mrp, stock, low_stock_at, art, tags, short, highlights, specs, in_box, variant_name, image_url, weight_g, sort, created_at, shop_product_variants(id, label, price, mrp, stock, sort)")
+    .select("description_html")
+    .eq("slug", slug)
     .eq("is_published", true)
-    .order("created_at", { ascending: false })
-    .order("sort", { ascending: true });
-  // Fail loudly: serving sample data would show wrong stock and break checkout.
-  // The previous cached catalog keeps serving while this retries.
-  if (error) throw new Error(`Catalog read failed: ${error.message}`);
-  return (data as unknown as Row[]).map((r, i) => fromRow(r, i));
+    .maybeSingle();
+  if (error) throw new Error(`Description read failed: ${error.message}`);
+  return data?.description_html ?? null;
 }
 
 export async function getAnnouncements(): Promise<Announcement[]> {

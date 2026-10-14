@@ -13,6 +13,9 @@ function fail(e: unknown): ActionResult {
   if (/duplicate key.*slug/i.test(msg)) return { ok: false, error: "Another product already uses this URL slug. Change the slug." };
   if (/duplicate key.*sku/i.test(msg)) return { ok: false, error: "Another product already uses this SKU." };
   if (/row-level security|permission denied/i.test(msg)) return { ok: false, error: "You don’t have permission to change the shop." };
+  if (/publish_needs_price/.test(msg)) return { ok: false, error: "Set a price before showing this product on the store." };
+  if (/price_before_stock/.test(msg)) return { ok: false, error: "Set a price before adding stock." };
+  if (/official sync/i.test(msg)) return { ok: false, error: "Official product details come from the brand and can’t be edited here." };
   return { ok: false, error: msg };
 }
 
@@ -112,6 +115,61 @@ export async function saveProduct(input: ProductInput): Promise<ActionResult> {
 
     updateTag(TAG_CATALOG);
     return { ok: true, id };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+// ───────────────────────── Official (brand-synced) products: admins edit commercial fields only.
+
+export interface OfficialEdit {
+  id: string;
+  category: string;
+  short: string;
+  tags: string[];
+  low_stock_at: number | string;
+  is_published: boolean;
+  /** Simple product (no options). */
+  price?: number | string;
+  mrp?: number | string | null;
+  stock?: number | string;
+  /** Per-option commercial fields; labels and SKUs stay official. */
+  variants?: { id: string; price: number | string; mrp?: number | string | null; stock: number | string }[];
+}
+
+export async function saveOfficialProduct(input: OfficialEdit): Promise<ActionResult> {
+  try {
+    const { sb } = await assertShopAdmin();
+    if (!categoryBySlug.has(input.category)) throw new Error("Choose a category.");
+    const variants = input.variants ?? [];
+    for (const v of variants) {
+      const price = int(v.price);
+      const stock = int(v.stock);
+      if (price === 0 && stock > 0) throw new Error("Set a price before adding stock.");
+      const { error } = await sb.from("shop_product_variants").update({ price, mrp: optInt(v.mrp), stock }).eq("id", v.id);
+      if (error) throw error;
+    }
+    const priced = variants.map((v) => int(v.price)).filter((n) => n > 0);
+    const row: Record<string, unknown> = {
+      category: input.category,
+      short: input.short.trim().slice(0, 300),
+      tags: input.tags,
+      low_stock_at: int(input.low_stock_at),
+    };
+    if (variants.length) {
+      row.price = priced.length ? Math.min(...priced) : 0;
+    } else {
+      row.price = int(input.price);
+      row.mrp = optInt(input.mrp);
+      row.stock = int(input.stock);
+      if (row.price === 0 && (row.stock as number) > 0) throw new Error("Set a price before adding stock.");
+    }
+    if (input.is_published && !(row.price as number)) throw new Error("Set a price before showing this product on the store.");
+    row.is_published = input.is_published;
+    const { error } = await sb.from("shop_products").update(row).eq("id", input.id);
+    if (error) throw error;
+    updateTag(TAG_CATALOG);
+    return { ok: true, id: input.id };
   } catch (e) {
     return fail(e);
   }
