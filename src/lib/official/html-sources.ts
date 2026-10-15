@@ -183,9 +183,11 @@ const tmotor: HtmlSource = {
 
 // ───────────────────────── DJI (official store): product sitemap → page state (window.__PRELOADED_STATE__)
 
-const DJI_DRONE = /^dji-(mini|air|mavic|avata|neo|flip|fpv|inspire|matrice|agras|phantom|lito)/;
+const DJI_DRONE = /^dji-(mini|air|mavic|avata|neo|flip|fpv|inspire|matrice|agras|phantom|lito)|^(matrice-\d+|m30t?|m350-rtk|m300-rtk)(-|$)/;
+/** Enterprise and agriculture drones: listed under Industrial & agri, and sold as plain SKUs on DJI's store. */
+const DJI_ENTERPRISE = /matrice|^m30t?(-|$)|^m3[05]0-rtk|mavic-3e|mavic-3t|mavic-3-thermal|mavic-3-enterprise|mavic-3m|agras/;
 const DJI_NOT_DRONE =
-  /refurbished|battery|propell|charg|filter|case|bag|strap|cable|hub|guard|lens|cover|mount|adapter|holder|sticker|landing|antenna|care|frame|protector|parachute|storage|screen|hood|module|motor|arm|shell|badge|t-shirt|license|damper|connector|controller$|remote|goggles|light|speaker|spotlight|-tw$|-sb(-\d+)?$/;
+  /refurbished|battery|propell|charg|filter|case|bag|strap|cable|hub|guard|lens|cover|mount|adapter|holder|sticker|landing|antenna|care|frame|protector|parachute|storage|screen|hood|module|motor|arm|shell|badge|t-shirt|license|damper|connector|controller|remote|payment|deposit|goggles|-kit$|-kit-|gps|esc$|-esc-|expansion|installation|light|speaker|spotlight|-tw$|-sb(-\d+)?$/;
 /** DJI's CDN serves fixed sizes; keep the 640px one (the store's loader picks smaller ones by width). */
 const djiImg = (u: string) => `https:${u.replace(/^https?:/, "")}`.split("?")[0].replace(/@[a-z_0-9]+\.(jpg|png|webp)$/, "@xlarge.$1");
 const djiSeen = new Set<string>();
@@ -226,7 +228,9 @@ const dji: HtmlSource = {
     // Only main products (DJI Care-eligible) with a price, in DJI's drone categories. Newer pages
     // (Neo, Flip) carry no breadcrumbs; the drone-name filter on the slug already applies to them.
     const inDroneCategory = crumbs.filter(Boolean).length === 0 || crumbs.some((c) => /drone|fpv|enterprise|agricultur/i.test(c));
-    if (!v || v.variantCategory !== "dji_care_main" || !(v.price > 0) || !inDroneCategory) return null;
+    const enterprise = DJI_ENTERPRISE.test(slug) || DJI_ENTERPRISE.test(String(v?.slug ?? ""));
+    const isMain = v?.variantCategory === "dji_care_main" || (enterprise && v?.variantCategory === "plain");
+    if (!v || !isMain || !(v.price > 0) || !inDroneCategory) return null;
     const title = decode(v.title).replace(/\s+/g, " ").trim();
     if (djiSeen.has(title.toLowerCase())) return null; // regional duplicates of the same kit
     djiSeen.add(title.toLowerCase());
@@ -242,7 +246,8 @@ const dji: HtmlSource = {
         (points.length ? `<h3>Highlights</h3><ul>${points.map((x) => `<li>${x}</li>`).join("")}</ul>` : "") +
         (inBox.length ? `<h3>In the box</h3><ul>${inBox.map((x: string) => `<li>${x}</li>`).join("")}</ul>` : ""),
     );
-    const category = "camera-drones"; // every DJI drone is listed under Camera drones
+    // Enterprise and agriculture drones go under Industrial & agri; every other DJI drone under Camera drones.
+    const category = enterprise ? "industrial-drones" : "camera-drones";
     return {
       source: "html", source_key: `store.dji.com:html:${v.id}`, source_url: url,
       sku: v.ean ? String(v.ean) : `DJI-${v.id}`, slug: slugify(displayName("DJI", title)),
