@@ -6,6 +6,8 @@ import { discountPct } from "@/lib/format";
 import { ProductGrid } from "./ProductCard";
 import { CloseIcon, FilterIcon } from "./icons";
 
+const PAGE = 48;
+
 type Sort = "featured" | "price-asc" | "price-desc" | "discount" | "newest";
 
 const sorts: { value: Sort; label: string }[] = [
@@ -40,6 +42,10 @@ export function Listing({
   const [onSale, setOnSale] = useState(false);
   const [group, setGroup] = useState<string | null>(null);
   const [panel, setPanel] = useState(false);
+  // Big categories hold hundreds of products: render a page at a time, restarting when filters change.
+  const filterKey = JSON.stringify([sort, brandSel, bands, inStock, onSale, group]);
+  const [paging, setPaging] = useState({ key: filterKey, count: PAGE });
+  const count = paging.key === filterKey ? paging.count : PAGE;
 
   const brandCounts = useMemo(() => {
     const m = new Map<string, number>();
@@ -134,7 +140,21 @@ export function Listing({
         </div>
 
         {shown.length ? (
-          <ProductGrid items={shown} />
+          <>
+            <ProductGrid items={shown.slice(0, count)} />
+            {shown.length > count ? (
+              <div className="mt-6 text-center">
+                <p className="text-sm text-muted tabular">Showing {count} of {shown.length}</p>
+                <button
+                  type="button"
+                  onClick={() => setPaging({ key: filterKey, count: count + PAGE })}
+                  className="mt-3 rounded-md bg-white px-5 py-2.5 text-sm font-medium ring-1 ring-line hover:ring-ink"
+                >
+                  Show {Math.min(PAGE, shown.length - count)} more
+                </button>
+              </div>
+            ) : null}
+          </>
         ) : (
           <div className="rounded-lg border border-dashed border-line bg-white p-10 text-center">
             <p className="font-medium">{items.length ? "Nothing matches these filters." : emptyText}</p>

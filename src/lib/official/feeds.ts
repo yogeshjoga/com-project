@@ -53,7 +53,7 @@ export interface OfficialItem {
   source_price: number | null;
   source_currency: string;
   variant_name: string | null;
-  variants: { source_key: string; label: string; sku: string | null; image_url: string | null; sort: number }[];
+  variants: { source_key: string; label: string; sku: string | null; image_url: string | null; sort: number; source_price?: number | null }[];
 }
 
 // Brands other stores resell. A title starting with one of these belongs to that brand, not the store.
@@ -182,7 +182,7 @@ async function shopify(src: Source, log: (m: string) => void): Promise<OfficialI
           let label = clip(decode(v.title), 80);
           if (seen.has(label.toLowerCase())) label = `${clip(decode(v.title), 60)} (${String(v.sku || v.id).slice(0, 16)})`;
           seen.add(label.toLowerCase());
-          return { source_key: `${host}:shopify:v:${v.id}`, label, sku: v.sku || null, image_url: v.featured_image?.src?.split("?")[0] ?? null, sort: i };
+          return { source_key: `${host}:shopify:v:${v.id}`, label, sku: v.sku || null, image_url: v.featured_image?.src?.split("?")[0] ?? null, sort: i, source_price: Number(v.price) > 0 ? Number(v.price) : null };
         }),
       });
     }

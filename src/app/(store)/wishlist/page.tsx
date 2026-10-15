@@ -2,21 +2,21 @@
 
 import Link from "next/link";
 import { useHydrated, useShop } from "@/store/shop";
-import { useCatalog } from "@/components/CatalogProvider";
+import { useCatalogNow } from "@/components/CatalogProvider";
 import { PageHead } from "@/components/PageHead";
 import { ProductGrid } from "@/components/ProductCard";
 
 export default function WishlistPage() {
   const wishlist = useShop((s) => s.wishlist);
   const ready = useHydrated();
-  const { items } = useCatalog();
+  const { items, loaded } = useCatalogNow();
   const saved = items.filter((p) => wishlist.includes(p.slug));
 
   return (
     <>
       <PageHead title="Wishlist" crumbs={[{ label: "Wishlist" }]} />
       <div className="mx-auto max-w-7xl px-4">
-        {!ready ? (
+        {!ready || (wishlist.length > 0 && !loaded) ? (
           <div className="h-64 animate-pulse rounded-lg bg-white ring-1 ring-line" />
         ) : saved.length ? (
           <ProductGrid items={saved} />

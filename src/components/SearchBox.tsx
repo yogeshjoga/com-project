@@ -11,7 +11,7 @@ import { SearchIcon } from "./icons";
 import { useCatalog } from "./CatalogProvider";
 
 export function SearchBox({ autoFocus = false, onDone }: { autoFocus?: boolean; onDone?: () => void }) {
-  const { items, categoryNames } = useCatalog();
+  const { items, categoryNames, loaded, load } = useCatalog();
   const index = useMemo(() => buildIndex(items, categoryNames), [items, categoryNames]);
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
@@ -52,12 +52,16 @@ export function SearchBox({ autoFocus = false, onDone }: { autoFocus?: boolean; 
           value={q}
           autoFocus={autoFocus}
           onChange={(e) => {
+            load();
             setQ(e.target.value);
             setOpen(true);
             setActive(0);
             setTouched(false);
           }}
-          onFocus={() => setOpen(true)}
+          onFocus={() => {
+            load();
+            setOpen(true);
+          }}
           onKeyDown={(e) => {
             if (e.key === "ArrowDown") { e.preventDefault(); setTouched(true); setActive((a) => Math.min(a + 1, results.length - 1)); }
             if (e.key === "ArrowUp") { e.preventDefault(); setTouched(true); setActive((a) => Math.max(a - 1, 0)); }
@@ -78,7 +82,9 @@ export function SearchBox({ autoFocus = false, onDone }: { autoFocus?: boolean; 
 
       {open && q.trim() ? (
         <div id={listId} role="listbox" className="absolute inset-x-0 top-full z-50 mt-1 overflow-hidden rounded-md bg-white text-ink shadow-xl ring-1 ring-line">
-          {results.length === 0 ? (
+          {!loaded ? (
+            <p className="px-4 py-3 text-sm text-muted">Searching…</p>
+          ) : results.length === 0 ? (
             <p className="px-4 py-3 text-sm text-muted">No products match “{q}”. Try a brand or part type, like “ELRS receiver”.</p>
           ) : (
             <>

@@ -12,7 +12,8 @@ import { ReceiptIcon, ShieldIcon, TruckIcon } from "@/components/icons";
 import Link from "next/link";
 
 export async function generateStaticParams() {
-  return (await getProducts()).map((p) => ({ slug: p.slug }));
+  // Prebuild the newest products; the rest of the catalog renders on first visit and is then cached.
+  return (await getProducts()).slice(0, 100).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/product/[slug]">): Promise<Metadata> {

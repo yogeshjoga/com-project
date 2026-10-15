@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { buildIndex, searchIndex } from "@/lib/search";
-import { useCatalog } from "@/components/CatalogProvider";
+import { useCatalogNow } from "@/components/CatalogProvider";
 import { PageHead } from "@/components/PageHead";
 import { Listing } from "@/components/Listing";
 
@@ -12,7 +12,7 @@ const suggestions = ["ELRS receiver", "6S LiPo", "O4", "Goggles", "ESP32", "Sold
 
 export function SearchResults() {
   const q = useSearchParams().get("q")?.trim() ?? "";
-  const { items, categoryNames } = useCatalog();
+  const { items, categoryNames, loaded } = useCatalogNow();
   const index = useMemo(() => buildIndex(items, categoryNames), [items, categoryNames]);
   const results = useMemo(() => searchIndex(index, q, 500), [index, q]);
 
@@ -20,7 +20,9 @@ export function SearchResults() {
     <>
       <PageHead title={q ? `Results for “${q}”` : "Search"} crumbs={[{ label: "Search" }]} />
       <div className="mx-auto max-w-7xl px-4">
-        {q && results.length ? (
+        {q && !loaded ? (
+          <div className="h-64 animate-pulse rounded-lg bg-white ring-1 ring-line" aria-label="Searching" />
+        ) : q && results.length ? (
           <Listing key={q} items={results} />
         ) : (
           <div className="rounded-lg bg-white p-8 ring-1 ring-line">
