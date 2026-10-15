@@ -6,15 +6,15 @@ import { Price } from "./Price";
 import { QuickAdd, WishButton } from "./CartButtons";
 
 export function StockNote({ stock }: { stock: number }) {
-  if (stock <= 0) return <span className="text-[13px] text-muted">Out of stock</span>;
-  if (stock <= 5) return <span className="text-[13px] font-medium text-warn">Only {stock} left</span>;
-  return <span className="text-[13px] text-go">In stock</span>;
+  if (stock <= 0) return <span className="text-[0.8125rem] text-muted">Out of stock</span>;
+  if (stock <= 5) return <span className="text-[0.8125rem] font-medium text-warn">Only {stock} left</span>;
+  return <span className="text-[0.8125rem] text-go">In stock</span>;
 }
 
 export function ProductCard({ p }: { p: ProductSummary }) {
   const off = discountPct(p.price, p.mrp);
   return (
-    <article className="group relative flex h-full flex-col rounded-lg border border-line bg-surface p-3 transition-colors hover:border-ink/40">
+    <article className="group relative flex h-full min-w-0 flex-col rounded-lg border border-line bg-surface p-2.5 transition-colors hover:border-ink/40 sm:p-3">
       <div className="relative mb-3 aspect-square overflow-hidden rounded-md bg-paper">
         <Link href={`/product/${p.slug}`} tabIndex={-1} aria-hidden="true">
           <ProductMedia imageUrl={p.imageUrl} art={p.art} hue={p.hue} alt={p.name} className="size-full p-3 transition-transform duration-300 group-hover:scale-[1.04]" />
@@ -30,11 +30,12 @@ export function ProductCard({ p }: { p: ProductSummary }) {
             <span className="rounded bg-white px-1.5 py-0.5 text-xs font-medium text-ink ring-1 ring-line">Made in India</span>
           ) : null}
         </div>
-        <WishButton slug={p.slug} className="absolute right-2 top-2" />
+        <WishButton slug={p.slug} className="absolute right-2 top-2 z-10" />
       </div>
       <p className="text-xs text-muted">{p.brand}</p>
-      <h3 className="mt-0.5 line-clamp-2 min-h-[2.6em] text-sm font-medium leading-snug">
-        <Link href={`/product/${p.slug}`} className="hover:text-signal-ink">
+      <h3 className="mt-0.5 line-clamp-2 min-h-[2.6em] text-sm font-medium leading-snug [overflow-wrap:anywhere]">
+        {/* The ::after stretches this link over the whole card, so any tap on the card opens the product. */}
+        <Link href={`/product/${p.slug}`} className="after:absolute after:inset-0 after:content-[''] hover:text-signal-ink">
           {p.name}
         </Link>
       </h3>
@@ -44,7 +45,7 @@ export function ProductCard({ p }: { p: ProductSummary }) {
       <div className="mb-3 mt-1">
         <StockNote stock={p.stock} />
       </div>
-      <div className="mt-auto">
+      <div className="relative z-10 mt-auto">
         <QuickAdd p={p} />
       </div>
     </article>

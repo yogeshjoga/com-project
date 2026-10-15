@@ -44,7 +44,7 @@ function loadRazorpay(): Promise<RazorpayCtor | null> {
   });
 }
 
-const field = "h-11 w-full rounded-md bg-white px-3 text-[15px] ring-1 ring-line focus:outline-none focus:ring-2 focus:ring-signal";
+const field = "h-11 w-full rounded-md bg-white px-3 text-[0.9375rem] ring-1 ring-line focus:outline-none focus:ring-2 focus:ring-signal";
 
 export function CheckoutClient({ onlineEnabled }: { onlineEnabled: boolean }) {
   const payments = onlineEnabled ? allPayments : allPayments.filter((p) => p.id === "cod");
@@ -157,7 +157,7 @@ export function CheckoutClient({ onlineEnabled }: { onlineEnabled: boolean }) {
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
         <span className="mx-auto grid size-14 place-items-center rounded-full bg-go text-white"><CheckIcon width={28} height={28} /></span>
-        <h1 className="mt-5 font-display text-[40px] font-semibold leading-none">{placed.how === "cod" ? "Order placed" : "Payment received"}</h1>
+        <h1 className="mt-5 font-display text-[2.5rem] font-semibold leading-none">{placed.how === "cod" ? "Order placed" : "Payment received"}</h1>
         <p className="mt-3 text-ink-2">
           {placed.how === "late" ? (
             <>We received <b className="tabular">{formatINR(placed.total)}</b> for order <b className="tabular">{placed.id}</b>, but its reservation had already expired. Our team will contact you to confirm the order or refund you in full.</>
@@ -176,7 +176,7 @@ export function CheckoutClient({ onlineEnabled }: { onlineEnabled: boolean }) {
   if (unpaid) {
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
-        <h1 className="font-display text-[40px] font-semibold leading-none">Complete your payment</h1>
+        <h1 className="font-display text-[2.5rem] font-semibold leading-none">Complete your payment</h1>
         <p className="mt-3 text-ink-2">
           Order <b className="tabular">{unpaid.payment.orderId}</b> for <b className="tabular">{formatINR(unpaid.total)}</b> is held for 30 minutes. It’s confirmed as soon as the payment goes through.
         </p>
@@ -219,12 +219,12 @@ export function CheckoutClient({ onlineEnabled }: { onlineEnabled: boolean }) {
   return (
     <>
       <PageHead title="Checkout" crumbs={[{ label: "Cart", href: "/cart" }, { label: "Checkout" }]} />
-      <form onSubmit={placeOrder} className="mx-auto grid max-w-7xl gap-6 px-4 lg:grid-cols-[1fr_380px]">
+      <form onSubmit={placeOrder} className="mx-auto grid grid-cols-[minmax(0,1fr)] max-w-7xl gap-6 px-4 lg:grid-cols-[1fr_23.75rem]">
         <div className="space-y-6">
           <fieldset className="rounded-lg bg-white p-5 ring-1 ring-line">
             <legend className="sr-only">Contact</legend>
             <h2 className="mb-4 font-display text-2xl font-semibold">Contact</h2>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
               <L label="Mobile number"><input name="phone" required inputMode="numeric" maxLength={10} autoComplete="tel-national" className={field} /></L>
               <L label="Email"><input name="email" type="email" required autoComplete="email" className={field} /></L>
             </div>
@@ -233,7 +233,7 @@ export function CheckoutClient({ onlineEnabled }: { onlineEnabled: boolean }) {
           <fieldset className="rounded-lg bg-white p-5 ring-1 ring-line">
             <legend className="sr-only">Delivery address</legend>
             <h2 className="mb-4 font-display text-2xl font-semibold">Delivery address</h2>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
               <L label="Full name" wide><input name="name" required autoComplete="name" className={field} /></L>
               <L label="House, building, street" wide><input name="line1" required autoComplete="address-line1" className={field} /></L>
               <L label="Area, landmark (optional)" wide><input name="line2" autoComplete="address-line2" className={field} /></L>
@@ -251,7 +251,7 @@ export function CheckoutClient({ onlineEnabled }: { onlineEnabled: boolean }) {
               Buying for a business? Add GSTIN for input tax credit
             </label>
             {business ? (
-              <div className="mt-3 grid gap-4 sm:grid-cols-2">
+              <div className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
                 <L label="GSTIN"><input name="gstin" required maxLength={15} className={`${field} uppercase`} /></L>
                 <L label="Business name"><input name="company" required autoComplete="organization" className={field} /></L>
               </div>

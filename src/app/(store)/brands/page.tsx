@@ -12,7 +12,7 @@ export default async function BrandsPage() {
   return (
     <>
       <PageHead title="Brands" blurb={`${all.length} brands we stock, from FPV gear to lab equipment.`} crumbs={[{ label: "Brands" }]} />
-      <div className="mx-auto max-w-[1760px] px-4 lg:px-6">
+      <div className="mx-auto max-w-[110rem] px-4 lg:px-6">
         <BrandWall items={featured} />
       </div>
     </>

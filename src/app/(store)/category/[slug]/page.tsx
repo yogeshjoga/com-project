@@ -22,7 +22,7 @@ export default async function CategoryPage({ params }: PageProps<"/category/[slu
   return (
     <>
       <PageHead title={c.name} blurb={c.blurb} crumbs={[{ label: d.name, href: `/department/${d.slug}` }, { label: c.name }]} />
-      <div className="mx-auto max-w-[1760px] px-4 lg:px-6">
+      <div className="mx-auto max-w-[110rem] px-4 lg:px-6">
         <Listing items={await productsInCategory(slug)} emptyText="We're restocking this category. Check back soon." />
       </div>
     </>

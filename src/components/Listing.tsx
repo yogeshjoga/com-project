@@ -113,7 +113,7 @@ export function Listing({
   );
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[13.75rem_1fr]">
       <aside className="hidden lg:block">{filters}</aside>
 
       <div className="min-w-0">
@@ -126,14 +126,14 @@ export function Listing({
           </div>
         ) : null}
 
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
           <p className="text-sm text-muted tabular">{shown.length} {shown.length === 1 ? "product" : "products"}</p>
-          <div className="flex items-center gap-2">
-            <button type="button" onClick={() => setPanel(true)} className="flex h-9 items-center gap-1.5 rounded-md bg-white px-3 text-sm ring-1 ring-line lg:hidden">
+          <div className="flex min-w-0 items-center gap-2">
+            <button type="button" onClick={() => setPanel(true)} className="flex h-10 shrink-0 items-center gap-1.5 rounded-md bg-white px-3 text-sm ring-1 ring-line lg:hidden">
               <FilterIcon /> Filters{active ? ` (${active})` : ""}
             </button>
             <label className="sr-only" htmlFor="sort">Sort by</label>
-            <select id="sort" value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="h-9 rounded-md bg-white px-2 text-sm ring-1 ring-line">
+            <select id="sort" value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="h-10 min-w-0 max-w-[11rem] rounded-md bg-white px-2 text-sm ring-1 ring-line sm:h-9">
               {sorts.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
@@ -166,7 +166,7 @@ export function Listing({
       {panel ? (
         <div className="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true" aria-label="Filters">
           <button type="button" aria-label="Close filters" className="absolute inset-0 bg-ink/50" onClick={() => setPanel(false)} />
-          <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-xl bg-white p-5">
+          <div className="absolute inset-x-0 bottom-0 max-h-[85dvh] overflow-y-auto overscroll-contain rounded-t-xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-2xl font-semibold">Filters</h2>
               <button type="button" onClick={() => setPanel(false)} aria-label="Close filters"><CloseIcon /></button>

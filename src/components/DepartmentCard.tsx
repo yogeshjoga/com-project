@@ -26,12 +26,12 @@ export function DepartmentCard({ title, href, tiles }: { title: string; href: st
                   className="size-full p-2 transition-transform duration-300 group-hover:scale-[1.04]"
                 />
               </span>
-              <span className="mt-1 block truncate text-[13px] group-hover:text-signal-ink">{t.category.name}</span>
+              <span className="mt-1 block truncate text-[0.8125rem] group-hover:text-signal-ink">{t.category.name}</span>
             </Link>
           </li>
         ))}
       </ul>
-      <Link href={href} className="mt-3 text-sm font-medium text-signal-ink hover:underline">
+      <Link href={href} className="-mb-1 mt-2 inline-block py-2 text-sm font-medium text-signal-ink hover:underline">
         Shop all {title.toLowerCase()}
       </Link>
     </section>

@@ -9,14 +9,14 @@ export function QuickAdd({ p }: { p: ProductSummary }) {
   const add = useShop((s) => s.add);
   if (p.stock <= 0) {
     return (
-      <span className="block w-full rounded-md border border-line py-2 text-center text-sm text-muted">Out of stock</span>
+      <span className="block w-full rounded-md border border-line py-2.5 text-center text-sm text-muted">Out of stock</span>
     );
   }
   if (p.hasVariants) {
     return (
       <Link
         href={`/product/${p.slug}`}
-        className="block w-full rounded-md border border-ink py-2 text-center text-sm font-medium text-ink hover:bg-ink hover:text-white"
+        className="block w-full rounded-md border border-ink py-2.5 text-center text-sm font-medium text-ink hover:bg-ink hover:text-white"
       >
         Choose options
       </Link>
@@ -39,7 +39,7 @@ export function QuickAdd({ p }: { p: ProductSummary }) {
           maxQty: p.stock,
         })
       }
-      className="block w-full rounded-md bg-ink py-2 text-center text-sm font-medium text-white hover:bg-ink-2 active:scale-[0.99]"
+      className="block w-full rounded-md bg-ink py-2.5 text-center text-sm font-medium text-white hover:bg-ink-2 active:scale-[0.99]"
     >
       Add to cart
     </button>
@@ -55,7 +55,7 @@ export function WishButton({ slug, className = "" }: { slug: string; className?:
       onClick={() => toggle(slug)}
       aria-pressed={on}
       aria-label={on ? "Remove from wishlist" : "Save to wishlist"}
-      className={`grid size-9 place-items-center rounded-full bg-white/90 text-ink hover:text-signal ${on ? "text-signal" : ""} ${className}`}
+      className={`grid size-10 place-items-center rounded-full bg-white/90 text-ink hover:text-signal ${on ? "text-signal" : ""} ${className}`}
     >
       <HeartIcon filled={on} width={18} height={18} />
     </button>

@@ -15,6 +15,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#0e2a49",
+  // Draw under notches; the safe-area padding in globals.css keeps content clear of them.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

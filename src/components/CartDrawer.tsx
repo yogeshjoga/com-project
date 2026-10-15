@@ -45,10 +45,10 @@ export function CartDrawer() {
   return (
     <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label="Cart">
       <button type="button" aria-label="Close cart" className="absolute inset-0 bg-ink/50" onClick={close} />
-      <aside className="drawer-in absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-white">
+      <aside className="drawer-in absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-white sm:max-w-[26rem] wide:max-w-[28rem]">
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <h2 className="font-display text-2xl font-semibold">Your cart <span className="text-muted tabular">({count})</span></h2>
-          <button type="button" onClick={close} aria-label="Close cart" className="rounded p-1 hover:bg-paper"><CloseIcon /></button>
+          <button type="button" onClick={close} aria-label="Close cart" className="grid size-11 place-items-center rounded hover:bg-paper"><CloseIcon /></button>
         </div>
 
         {cart.length === 0 ? (
@@ -84,7 +84,7 @@ export function CartDrawer() {
                 </li>
               ))}
             </ul>
-            <div className="border-t border-line px-5 py-4">
+            <div className="border-t border-line px-5 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4">
               <div className="flex items-baseline justify-between">
                 <span className="text-sm text-muted">Subtotal (inc. GST)</span>
                 <span className="text-xl font-semibold tabular">{formatINR(subtotal)}</span>

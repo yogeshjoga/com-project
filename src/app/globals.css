@@ -47,11 +47,36 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/*
+ * Everything is sized in rem, so scaling the root scales the whole store. Laptops and phones stay
+ * at 16px; desktops, large monitors and TVs grow the interface in steps so it keeps the same
+ * proportions (about 107rem wide) instead of turning into tiny type with huge margins. The
+ * layout breakpoints stay in real pixels, so a 4K screen gets the wide grid, just larger.
+ */
+@media (min-width: 1920px) { html { font-size: 112.5%; } }  /* 18px: full HD */
+@media (min-width: 2560px) { html { font-size: 150%; } }    /* 24px: QHD / 1440p */
+@media (min-width: 3200px) { html { font-size: 187.5%; } }  /* 30px: ultrawide / 5K */
+@media (min-width: 3840px) { html { font-size: 225%; } }    /* 36px: 4K TV */
+
+/* Notches and rounded corners: keep content out of the unsafe edges in landscape. */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Room for the phone buy bar on product pages so it never covers the footer. */
+@media (max-width: 47.99rem) {
+  body[data-sticky-bar] { padding-bottom: 4.75rem; }
+}
+
+/* No double-tap-zoom delay on controls; links and buttons respond to the first tap. */
+a, button, summary, select, label, input { touch-action: manipulation; }
+
 body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-plex), system-ui, sans-serif;
-  font-size: 15px;
+  font-size: 0.9375rem;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -65,10 +90,13 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-:focus-visible {
-  outline: 2px solid var(--signal);
-  outline-offset: 2px;
-  border-radius: 4px;
+/* In the base layer so a component can opt out (e.g. the search field draws its own ring). */
+@layer base {
+  :focus-visible {
+    outline: 0.1875rem solid var(--signal);
+    outline-offset: 0.125rem;
+    border-radius: 0.25rem;
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -81,8 +109,8 @@ body {
 /* OSD frame used only in the home hero. */
 .osd-corner {
   position: absolute;
-  width: 22px;
-  height: 22px;
+  width: 1.375rem;
+  height: 1.375rem;
   border-color: var(--hud);
   border-style: solid;
   border-width: 0;

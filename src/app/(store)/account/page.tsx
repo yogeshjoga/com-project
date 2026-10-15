@@ -25,7 +25,7 @@ export default function AccountPage() {
   return (
     <>
       <PageHead title="Your account" crumbs={[{ label: "Account" }]} />
-      <div className="mx-auto grid max-w-7xl gap-6 px-4 lg:grid-cols-[1fr_320px]">
+      <div className="mx-auto grid grid-cols-[minmax(0,1fr)] max-w-7xl gap-6 px-4 lg:grid-cols-[1fr_20rem]">
         <section className="rounded-lg bg-white p-5 ring-1 ring-line">
           <h2 className="font-display text-2xl font-semibold">Orders</h2>
           {orders === null ? (

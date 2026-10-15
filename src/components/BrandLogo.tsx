@@ -44,7 +44,7 @@ export function BrandLogo({
       alt={`${name} logo`}
       width={w * 2}
       height={h * 2}
-      style={{ width: w, height: h }}
+      style={{ width: `${w / 16}rem`, height: `${h / 16}rem` }}
       sizes={`${w}px`}
       priority={priority}
       className={`object-contain ${muted ? "logo-muted" : ""}`}

@@ -17,18 +17,18 @@ export function Hero({ featured }: { featured: Product }) {
   const s = featured.specs;
   return (
     <section className="bg-ink text-white">
-      <div className="mx-auto grid max-w-[1760px] items-center gap-10 px-4 lg:px-6 pb-20 pt-8 md:grid-cols-[1fr_1.1fr] md:pb-24 md:pt-10 xl:grid-cols-[1fr_1fr]">
+      <div className="mx-auto grid grid-cols-[minmax(0,1fr)] max-w-[110rem] items-center gap-10 px-4 lg:px-6 pb-20 pt-8 md:grid-cols-[1fr_1.1fr] md:pb-24 md:pt-10 xl:grid-cols-[1fr_1fr]">
         <div>
-          <h1 className="font-display text-[44px] font-semibold leading-[0.95] sm:text-[60px] lg:text-[72px]">
+          <h1 className="font-display text-[clamp(2.5rem,1.4rem+4.4vw,4.5rem)] font-semibold leading-[0.95]">
             Every part for the way you fly.
           </h1>
-          <p className="mt-4 max-w-md text-[17px] text-white/75">
+          <p className="mt-4 max-w-md text-[1.0625rem] text-white/75">
             Ready-to-fly quads, goggles, motors and the electronics bench behind them. Genuine stock, priced with GST, shipped across India.
           </p>
           <ul className="mt-6 flex flex-wrap gap-2">
             {quick.map((q) => (
               <li key={q.href}>
-                <Link href={q.href} className="block rounded-full border border-white/25 px-3.5 py-1.5 text-sm hover:border-signal hover:text-signal">
+                <Link href={q.href} className="block rounded-full border border-white/25 px-3.5 py-2.5 text-sm hover:border-signal hover:text-signal sm:py-1.5">
                   {q.label}
                 </Link>
               </li>
@@ -61,11 +61,11 @@ export function Hero({ featured }: { featured: Product }) {
               <ProductArt kind={featured.art} hue={88} color="#e8eefb" className="size-full transition-transform duration-500 group-hover:scale-105" />
             </div>
   
-            <dl className="absolute left-7 top-7 font-mono text-[12px] leading-5 text-hud sm:text-[13px]">
+            <dl className="absolute left-7 top-7 font-mono text-[0.75rem] leading-5 text-hud sm:text-[0.8125rem]">
               <div className="flex gap-2"><dt className="opacity-60">BAT</dt><dd>{s["Battery"]?.split(" ")[0] ?? "6S"}</dd></div>
               <div className="flex gap-2"><dt className="opacity-60">VTX</dt><dd>{s["Video"] ?? "Digital"}</dd></div>
             </dl>
-            <dl className="absolute right-7 top-7 text-right font-mono text-[12px] leading-5 text-hud sm:text-[13px]">
+            <dl className="absolute right-7 top-7 text-right font-mono text-[0.75rem] leading-5 text-hud sm:text-[0.8125rem]">
               {s["Wheelbase"] ? <div className="flex justify-end gap-2"><dt className="opacity-60">WB</dt><dd>{s["Wheelbase"]}</dd></div> : null}
               {s["Dry weight"] ? <div className="flex justify-end gap-2"><dt className="opacity-60">AUW</dt><dd>{s["Dry weight"]}</dd></div> : null}
             </dl>

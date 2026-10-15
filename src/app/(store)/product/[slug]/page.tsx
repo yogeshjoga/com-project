@@ -53,7 +53,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-      <div className="mx-auto max-w-[1760px] px-4 lg:px-6 pt-6">
+      <div className="mx-auto max-w-[110rem] px-4 lg:px-6 pt-6">
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
@@ -64,20 +64,20 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
         />
 
         {/* Gallery | details | buy box on wide screens; the buy box drops under the details below xl. */}
-        <div className="mt-5 grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-10 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_340px]">
-          <div className="lg:sticky lg:top-40 lg:row-span-2 lg:self-start xl:row-span-1">
+        <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_21.25rem]">
+          <div className="md:row-span-2 md:self-start lg:sticky lg:top-40 xl:row-span-1">
             <ProductGallery images={p.images} name={p.name} art={p.art} hue={p.hue} />
           </div>
 
           <div>
-            <Link href={`/brand/${brandSlug(p.brand)}`} className="inline-flex items-center gap-2 text-sm font-medium text-signal-ink hover:underline">
+            <Link href={`/brand/${brandSlug(p.brand)}`} className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-signal-ink hover:underline">
               {brandLogo ? (
                 <BrandLogo name={p.brand} logoUrl={brandLogo} width={brandInfo?.logoWidth} height={brandInfo?.logoHeight} maxW={110} maxH={30} area={1500} />
               ) : null}
               <span className={brandLogo ? "sr-only" : ""}>{p.brand}</span>
             </Link>
-            <h1 className="mt-1 font-display text-[34px] font-semibold leading-[1.02] md:text-[42px]">{p.name}</h1>
-            {p.short ? <p className="mt-3 text-[16px] text-ink-2">{p.short}</p> : null}
+            <h1 className="mt-1 font-display text-[2.125rem] font-semibold leading-[1.02] md:text-[2.625rem]">{p.name}</h1>
+            {p.short ? <p className="mt-3 text-[1rem] text-ink-2">{p.short}</p> : null}
             <ul className="mt-4 space-y-1.5 text-sm">
               {p.highlights.map((h) => (
                 <li key={h} className="flex gap-2"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-signal" aria-hidden="true" />{h}</li>
@@ -85,7 +85,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
             </ul>
           </div>
 
-          <div className="lg:col-start-2 xl:sticky xl:top-40 xl:col-start-3 xl:row-start-1 xl:self-start">
+          <div className="md:col-start-2 xl:sticky xl:top-40 xl:col-start-3 xl:row-start-1 xl:self-start">
             <div className="border-t border-line pt-6 xl:rounded-lg xl:border-t-0 xl:bg-white xl:p-5 xl:ring-1 xl:ring-line">
               <BuyBox p={buyable} />
             </div>
@@ -101,9 +101,9 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
         {description ? (
           <section className="mt-12" aria-labelledby="product-description">
             <div className="flex flex-wrap items-baseline justify-between gap-3">
-              <h2 id="product-description" className="font-display text-[28px] font-semibold">Description</h2>
+              <h2 id="product-description" className="font-display text-[1.75rem] font-semibold">Description</h2>
               {p.sourceUrl ? (
-                <a href={p.sourceUrl} target="_blank" rel="noopener nofollow" className="text-sm text-signal-ink hover:underline">
+                <a href={p.sourceUrl} target="_blank" rel="noopener nofollow" className="inline-block py-2 text-sm text-signal-ink hover:underline">
                   Official {p.brand} product page
                 </a>
               ) : null}
@@ -113,12 +113,12 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
           </section>
         ) : null}
 
-        <div className="mt-12 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
+        <div className="mt-12 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[1.4fr_1fr]">
           <section>
-            <h2 className="font-display text-[28px] font-semibold">Specifications</h2>
+            <h2 className="font-display text-[1.75rem] font-semibold">Specifications</h2>
             <dl className="mt-3 divide-y divide-line overflow-hidden rounded-lg bg-white ring-1 ring-line">
               {Object.entries({ Brand: p.brand, Category: c.name, ...p.specs, SKU: p.sku }).map(([k, v]) => (
-                <div key={k} className="grid grid-cols-[minmax(120px,40%)_1fr] gap-4 px-4 py-2.5 text-sm">
+                <div key={k} className="grid grid-cols-[minmax(7.5rem,40%)_1fr] gap-4 px-4 py-2.5 text-sm">
                   <dt className="text-muted">{k}</dt>
                   <dd className="font-medium">{v}</dd>
                 </div>
@@ -128,14 +128,14 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
           <div className="space-y-8">
             {p.inBox ? (
               <section>
-                <h2 className="font-display text-[28px] font-semibold">In the box</h2>
+                <h2 className="font-display text-[1.75rem] font-semibold">In the box</h2>
                 <ul className="mt-3 space-y-1.5 rounded-lg bg-white p-4 text-sm ring-1 ring-line">
                   {p.inBox.map((x) => <li key={x}>{x}</li>)}
                 </ul>
               </section>
             ) : null}
             <section>
-              <h2 className="font-display text-[28px] font-semibold">Shipping & returns</h2>
+              <h2 className="font-display text-[1.75rem] font-semibold">Shipping & returns</h2>
               <div className="mt-3 space-y-2 rounded-lg bg-white p-4 text-sm text-ink-2 ring-1 ring-line">
                 <p>Orders placed before 3 pm ship the same working day from {brand.dispatchCity}.</p>
                 <p>Free shipping above ₹{brand.freeShippingAbove.toLocaleString("en-IN")}. Cash on delivery available for most PIN codes.</p>

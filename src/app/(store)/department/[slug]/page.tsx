@@ -22,7 +22,7 @@ export default async function DepartmentPage({ params }: PageProps<"/department/
   return (
     <>
       <PageHead title={d.name} blurb={cats.map((c) => c.name).join(", ")} crumbs={[{ label: d.name }]} />
-      <div className="mx-auto max-w-[1760px] px-4 lg:px-6">
+      <div className="mx-auto max-w-[110rem] px-4 lg:px-6">
         <Listing items={await productsInDepartment(slug)} groups={cats.map((c) => ({ key: c.slug, label: c.name }))} />
       </div>
     </>

@@ -60,8 +60,8 @@ export default async function Home() {
       {featured ? <Hero featured={featured} /> : null}
 
       {deptCards.length ? (
-        <div className="relative z-10 mx-auto -mt-10 max-w-[1760px] px-4 lg:px-6">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="relative z-10 mx-auto -mt-10 max-w-[110rem] px-4 lg:px-6">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {/* Phones get the first four departments; the rest are one tap away in the menu. */}
             {deptCards.map(({ d, tiles }, i) => (
               <div key={d.slug} className={i >= 4 ? "hidden sm:block" : undefined}>
@@ -91,13 +91,13 @@ export default async function Home() {
         <ProductRail items={fresh} />
       </Section>
 
-      <section className="mx-auto mt-12 max-w-[1760px] px-4 lg:px-6">
+      <section className="mx-auto mt-12 max-w-[110rem] px-4 lg:px-6">
         <div className="rounded-lg bg-white p-6 ring-1 ring-line md:p-8">
           <div className="max-w-2xl">
-            <h2 className="font-display text-[32px] font-semibold leading-none">Building your first 5 inch?</h2>
+            <h2 className="font-display text-[2rem] font-semibold leading-none">Building your first 5 inch?</h2>
             <p className="mt-2 text-muted">These are the parts a freestyle quad needs, in the order most pilots buy them. Each step opens a filtered list.</p>
           </div>
-          <ol className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 wide:grid-cols-6">
+          <ol className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-3 wide:grid-cols-6">
             {buildSteps.map((s, i) => (
               <li key={s.cat}>
                 <Link href={`/category/${s.cat}`} className="flex h-full gap-3 rounded-md border border-line p-4 hover:border-signal">

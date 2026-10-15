@@ -14,11 +14,11 @@ export function Section({
   className?: string;
 }) {
   return (
-    <section className={`mx-auto max-w-[1760px] px-4 pt-10 lg:px-6 ${className}`}>
+    <section className={`mx-auto max-w-[110rem] px-4 pt-10 lg:px-6 ${className}`}>
       <div className="mb-4 flex items-end justify-between gap-4">
-        <h2 className="font-display text-[28px] font-semibold leading-none md:text-[32px]">{title}</h2>
+        <h2 className="font-display text-[1.75rem] font-semibold leading-none md:text-[2rem]">{title}</h2>
         {href ? (
-          <Link href={href} className="shrink-0 text-sm font-medium text-signal-ink hover:underline">
+          <Link href={href} className="shrink-0 py-2 text-sm font-medium text-signal-ink hover:underline">
             {linkLabel}
           </Link>
         ) : null}
@@ -30,7 +30,7 @@ export function Section({
 
 export function Breadcrumbs({ items }: { items: { label: string; href?: string }[] }) {
   return (
-    <nav aria-label="Breadcrumb" className="text-[13px] text-muted">
+    <nav aria-label="Breadcrumb" className="text-[0.8125rem] text-muted">
       <ol className="flex flex-wrap items-center gap-1.5">
         {items.map((it, i) => (
           <li key={it.label} className="flex items-center gap-1.5">

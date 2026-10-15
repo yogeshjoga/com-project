@@ -45,7 +45,7 @@ export function SearchBox({ autoFocus = false, onDone }: { autoFocus?: boolean; 
 
   return (
     <div ref={wrap} className="relative w-full" onBlur={(e) => !wrap.current?.contains(e.relatedTarget) && setOpen(false)}>
-      <form role="search" onSubmit={submit} className="flex h-11 items-center rounded-md bg-white ring-1 ring-line focus-within:ring-2 focus-within:ring-signal">
+      <form role="search" onSubmit={submit} className="flex h-11 items-center rounded-md bg-white ring-1 ring-line focus-within:ring-[3px] focus-within:ring-signal">
         <SearchIcon className="ml-3 shrink-0 text-muted" width={18} height={18} />
         <input
           type="search"
@@ -73,7 +73,7 @@ export function SearchBox({ autoFocus = false, onDone }: { autoFocus?: boolean; 
           aria-expanded={open && results.length > 0}
           aria-controls={listId}
           aria-autocomplete="list"
-          className="h-full w-full min-w-0 bg-transparent px-2.5 text-[15px] text-ink outline-none placeholder:text-muted"
+          className="h-full w-full min-w-0 rounded-none bg-transparent px-2.5 text-base text-ink outline-none placeholder:text-muted"
         />
         <button type="submit" className="mr-1 h-9 shrink-0 rounded bg-signal px-4 text-sm font-semibold text-ink hover:bg-signal-hover">
           Search

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Product } from "@/lib/types";
 import { brand } from "@/config/brand";
 import { formatINR } from "@/lib/format";
@@ -21,6 +21,23 @@ export function BuyBox({ p }: { p: Buyable }) {
   const [qty, setQty] = useState(1);
   const add = useShop((s) => s.add);
   const router = useRouter();
+
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const [barOn, setBarOn] = useState(false);
+
+  // On phones the buy buttons scroll away; a bar pinned to the bottom keeps the price and
+  // "Add to cart" in reach until they're back in view.
+  useEffect(() => {
+    const el = actionsRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => setBarOn(!e.isIntersecting), { rootMargin: "0px 0px -64px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  useEffect(() => {
+    document.body.toggleAttribute("data-sticky-bar", barOn);
+    return () => document.body.removeAttribute("data-sticky-bar");
+  }, [barOn]);
 
   const opt = opts?.[vi];
   const price = opt?.price ?? p.price;
@@ -85,7 +102,7 @@ export function BuyBox({ p }: { p: Buyable }) {
       <StockNote stock={stock} />
 
       {stock > 0 ? (
-        <div className="flex flex-wrap items-center gap-3">
+        <div ref={actionsRef} className="flex flex-wrap items-center gap-3">
           <QtyStepper value={qty} max={stock} onChange={setQty} />
           <button type="button" onClick={() => addToCart()} className="h-11 min-w-[8.5rem] flex-1 whitespace-nowrap rounded-md bg-ink px-6 font-medium text-white hover:bg-ink-2">
             Add to cart
@@ -114,6 +131,22 @@ export function BuyBox({ p }: { p: Buyable }) {
       )}
 
       <DeliveryCheck />
+
+      {stock > 0 && barOn ? (
+        <div className="fixed inset-x-0 bottom-0 z-30 flex items-center gap-3 border-t border-line bg-white px-4 pb-[calc(0.625rem+env(safe-area-inset-bottom))] pt-2.5 shadow-[0_-4px_16px_rgba(14,42,73,0.08)] md:hidden">
+          <div className="min-w-0 flex-1 leading-tight">
+            <p className="text-lg font-semibold tabular">{formatINR(price)}</p>
+            {opt ? <p className="truncate text-xs text-muted">{opt.label}</p> : null}
+          </div>
+          <button
+            type="button"
+            onClick={() => (opts ? actionsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }) : addToCart())}
+            className="h-11 shrink-0 rounded-md bg-ink px-6 font-medium text-white active:bg-ink-2"
+          >
+            {opts ? "Choose option" : "Add to cart"}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

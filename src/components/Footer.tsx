@@ -14,13 +14,13 @@ const promises = [
 export function TrustBar() {
   return (
     <section className="border-y border-line bg-white">
-      <div className="mx-auto grid max-w-[1760px] grid-cols-2 gap-x-4 gap-y-5 px-4 lg:px-6 py-6 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-[110rem] grid-cols-2 gap-x-4 gap-y-5 px-4 lg:px-6 py-6 lg:grid-cols-4">
         {promises.map(({ icon: Icon, title, body }) => (
           <div key={title} className="flex gap-3">
             <Icon className="mt-0.5 shrink-0 text-signal" />
             <div>
               <p className="text-sm font-semibold">{title}</p>
-              <p className="text-[13px] text-muted">{body}</p>
+              <p className="text-[0.8125rem] text-muted">{body}</p>
             </div>
           </div>
         ))}
@@ -33,7 +33,7 @@ export function Footer() {
   return (
     <footer className="mt-16 bg-ink text-white/75">
       <TrustBar />
-      <div className="mx-auto grid max-w-[1760px] gap-10 px-4 lg:px-6 py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="mx-auto grid grid-cols-[minmax(0,1fr)] max-w-[110rem] gap-10 px-4 lg:px-6 py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <Logo className="h-10 w-auto" />
           <p className="mt-3 text-sm tracking-[0.2em] text-white/60">{brand.tagline}</p>
@@ -43,7 +43,7 @@ export function Footer() {
         </div>
         <div>
           <h2 className="mb-3 text-sm font-semibold text-white">Shop</h2>
-          <ul className="space-y-2 text-sm">
+          <ul className="text-sm [&_a]:inline-block [&_a]:py-1.5">
             {departments.map((d) => (
               <li key={d.slug}><Link href={`/department/${d.slug}`} className="hover:text-white">{d.name}</Link></li>
             ))}
@@ -51,7 +51,7 @@ export function Footer() {
         </div>
         <div>
           <h2 className="mb-3 text-sm font-semibold text-white">Help</h2>
-          <ul className="space-y-2 text-sm">
+          <ul className="text-sm [&_a]:inline-block [&_a]:py-1.5">
             <li><Link href="/track-order" className="hover:text-white">Track your order</Link></li>
             <li><Link href="/support" className="hover:text-white">Shipping & delivery</Link></li>
             <li><Link href="/support#returns" className="hover:text-white">Returns & warranty</Link></li>
@@ -60,7 +60,7 @@ export function Footer() {
         </div>
         <div>
           <h2 className="mb-3 text-sm font-semibold text-white">Talk to us</h2>
-          <ul className="space-y-2 text-sm">
+          <ul className="text-sm [&_a]:inline-block [&_a]:py-1.5">
             {brand.supportPhone ? <li><a href={`tel:${brand.supportPhone.replace(/\s/g, "")}`} className="hover:text-white">{brand.supportPhone}</a></li> : null}
             <li><a href={`mailto:${brand.supportEmail}`} className="hover:text-white">{brand.supportEmail}</a></li>
             {brand.whatsapp ? <li><a href={`https://wa.me/${brand.whatsapp}`} className="hover:text-white" rel="noopener" target="_blank">WhatsApp</a></li> : null}
@@ -69,7 +69,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <p className="mx-auto max-w-[1760px] px-4 lg:px-6 py-5 text-xs text-white/50">
+        <p className="mx-auto max-w-[110rem] px-4 lg:px-6 py-5 text-xs text-white/50">
           © {brand.legalName}. Prices include GST. Flying drones in India is governed by the Drone Rules, 2021. Check the Digital Sky airspace map before you fly.
         </p>
       </div>

@@ -15,16 +15,16 @@ export function Price({
   const big = size === "lg";
   return (
     <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 tabular">
-      <span className={`font-semibold text-ink ${big ? "text-3xl" : "text-[17px]"}`}>
+      <span className={`font-semibold text-ink ${big ? "text-3xl" : "text-[1.0625rem]"}`}>
         {formatINR(price)}
         {maxPrice ? <span className="font-normal text-muted"> – {formatINR(maxPrice)}</span> : null}
       </span>
       {off > 0 && !maxPrice ? (
         <>
-          <s className={`text-muted ${big ? "text-base" : "text-[13px]"}`} aria-label={`MRP ${formatINR(mrp!)}`}>
+          <s className={`text-muted ${big ? "text-base" : "text-[0.8125rem]"}`} aria-label={`MRP ${formatINR(mrp!)}`}>
             {formatINR(mrp!)}
           </s>
-          <span className={`font-semibold text-signal-ink ${big ? "text-base" : "text-[13px]"}`}>{off}% off</span>
+          <span className={`font-semibold text-signal-ink ${big ? "text-base" : "text-[0.8125rem]"}`}>{off}% off</span>
         </>
       ) : null}
       {big ? <span className="basis-full text-sm text-muted">Inclusive of 18% GST. GST invoice provided.</span> : null}

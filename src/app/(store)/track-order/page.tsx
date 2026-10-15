@@ -26,7 +26,7 @@ export default function TrackOrderPage() {
     <>
       <PageHead title="Track your order" blurb="Enter the order ID from your confirmation and the mobile number you ordered with." crumbs={[{ label: "Track order" }]} />
       <div className="mx-auto max-w-2xl px-4">
-        <form onSubmit={track} className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+        <form onSubmit={track} className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[1fr_1fr_auto]">
           <label className="text-sm"><span className="sr-only">Order ID</span><input name="id" placeholder="Order ID, e.g. EG261000001" required className={`${field} uppercase`} /></label>
           <label className="text-sm"><span className="sr-only">Mobile number</span><input name="phone" inputMode="numeric" maxLength={10} placeholder="Mobile number" required className={field} /></label>
           <button type="submit" disabled={pending} className="h-11 rounded-md bg-ink px-5 font-medium text-white disabled:opacity-60">{pending ? "Checking…" : "Track"}</button>

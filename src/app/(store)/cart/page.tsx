@@ -16,7 +16,7 @@ export default function CartPage() {
   return (
     <>
       <PageHead title="Cart" crumbs={[{ label: "Cart" }]} />
-      <div className="mx-auto max-w-[1760px] px-4 lg:px-6">
+      <div className="mx-auto max-w-[110rem] px-4 lg:px-6">
         {!ready ? (
           <div className="h-64 animate-pulse rounded-lg bg-white ring-1 ring-line" />
         ) : cart.length === 0 ? (
@@ -25,7 +25,7 @@ export default function CartPage() {
             <Link href="/deals" className="mt-4 inline-block rounded-md bg-ink px-5 py-2.5 text-sm font-medium text-white">Browse hot deals</Link>
           </div>
         ) : (
-          <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[1fr_22.5rem]">
             <div className="space-y-4">
               <div className="rounded-lg bg-white p-4 ring-1 ring-line">
                 <FreeShippingMeter subtotal={cart.reduce((n, l) => n + l.price * l.qty, 0)} />
@@ -43,8 +43,8 @@ export default function CartPage() {
                       <p className="mt-1 text-sm tabular">{formatINR(l.price)} each</p>
                       <div className="mt-3 flex flex-wrap items-center gap-4">
                         <QtyStepper value={l.qty} max={l.maxQty} onChange={(n) => setQty(l.key, n)} small />
-                        <button type="button" onClick={() => { toggleWish(l.slug); remove(l.key); }} className="text-sm text-muted hover:text-ink">Save for later</button>
-                        <button type="button" onClick={() => remove(l.key)} className="text-sm text-muted hover:text-signal-ink">Remove</button>
+                        <button type="button" onClick={() => { toggleWish(l.slug); remove(l.key); }} className="py-2 text-sm text-muted hover:text-ink">Save for later</button>
+                        <button type="button" onClick={() => remove(l.key)} className="py-2 text-sm text-muted hover:text-signal-ink">Remove</button>
                       </div>
                     </div>
                     <p className="shrink-0 font-semibold tabular">{formatINR(l.price * l.qty)}</p>
