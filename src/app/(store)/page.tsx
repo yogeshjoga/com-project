@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { categories, categoryBySlug, departments } from "@/data/categories";
-import { bestsellers, brands, categoryCounts, getProduct, getSummaries, hotDeals, justLanded, productsInDepartment } from "@/lib/catalog";
-import { Hero } from "@/components/Hero";
+import { bestsellers, brands, categoryCounts, getSummaries, hotDeals, justLanded, productsInDepartment } from "@/lib/catalog";
+import { HeroCarousel } from "@/components/HeroCarousel";
+import { heroSlides } from "@/lib/hero";
 import { Section } from "@/components/Section";
 import { ProductGrid, ProductRail } from "@/components/ProductCard";
 import { CategoryTile } from "@/components/CategoryTile";
@@ -27,8 +28,7 @@ const buildSteps = [
 ];
 
 export default async function Home() {
-  const [featuredPick, electronicsAll, counts, deals, fresh, best, brandList, all] = await Promise.all([
-    getProduct("geprc-mark5-o4-pro-dc-fpv-drone"),
+  const [electronicsAll, counts, deals, fresh, best, brandList, all] = await Promise.all([
     productsInDepartment("electronics"),
     categoryCounts(),
     hotDeals(16),
@@ -37,9 +37,7 @@ export default async function Home() {
     brands(),
     getSummaries(),
   ]);
-  // Featured hero product: the pinned flagship, else the newest in-stock drone that has a photo.
-  const heroPick = all.find((p) => p.category === "fpv-drones" && p.stock > 0 && p.imageUrl) ?? all.find((p) => p.stock > 0 && p.imageUrl) ?? all[0];
-  const featured = featuredPick ?? (heroPick ? await getProduct(heroPick.slug) : undefined);
+  const slides = heroSlides(all);
   const electronics = electronicsAll.filter((p) => p.imageUrl).slice(0, 16);
 
   // Each department shows four of its categories, each by an in-stock product with a photo.
@@ -57,10 +55,10 @@ export default async function Home() {
 
   return (
     <>
-      {featured ? <Hero featured={featured} /> : null}
+      <HeroCarousel slides={slides} />
 
       {deptCards.length ? (
-        <div className="relative z-10 mx-auto -mt-10 max-w-[110rem] px-4 lg:px-6">
+        <div className="relative z-10 mx-auto -mt-14 max-w-[110rem] px-4 lg:px-6">
           <div className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {/* Phones get the first four departments; the rest are one tap away in the menu. */}
             {deptCards.map(({ d, tiles }, i) => (
