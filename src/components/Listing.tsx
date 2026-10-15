@@ -141,7 +141,7 @@ export function Listing({
 
         {shown.length ? (
           <>
-            <ProductGrid items={shown.slice(0, count)} />
+            <ProductGrid items={shown.slice(0, count)} layout="sidebar" />
             {shown.length > count ? (
               <div className="mt-6 text-center">
                 <p className="text-sm text-muted tabular">Showing {count} of {shown.length}</p>

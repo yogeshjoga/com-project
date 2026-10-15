@@ -19,7 +19,7 @@ export function SearchResults() {
   return (
     <>
       <PageHead title={q ? `Results for “${q}”` : "Search"} crumbs={[{ label: "Search" }]} />
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="mx-auto max-w-[1760px] px-4 lg:px-6">
         {q && !loaded ? (
           <div className="h-64 animate-pulse rounded-lg bg-white ring-1 ring-line" aria-label="Searching" />
         ) : q && results.length ? (

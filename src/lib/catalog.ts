@@ -167,9 +167,16 @@ export async function hotDeals(limit = 12) {
     .slice(0, limit);
 }
 
+// Spare parts and cables shouldn't lead a "just landed" shelf; complete products with photos come first.
+const SHELF_FILLER = new Set(["accessories", "cables-connectors"]);
+const showcase = (p: ProductSummary) => Number(Boolean(p.imageUrl) && p.stock > 0 && !SHELF_FILLER.has(p.category));
+
 export async function justLanded(limit = 12) {
   return [...(await getSummaries())]
-    .sort((a, b) => Number(b.tags.includes("new")) - Number(a.tags.includes("new")) || a.addedOrder - b.addedOrder)
+    .sort((a, b) =>
+      Number(b.tags.includes("new")) - Number(a.tags.includes("new")) ||
+      showcase(b) - showcase(a) ||
+      a.addedOrder - b.addedOrder)
     .slice(0, limit);
 }
 

@@ -14,7 +14,7 @@ export function Section({
   className?: string;
 }) {
   return (
-    <section className={`mx-auto max-w-7xl px-4 pt-12 ${className}`}>
+    <section className={`mx-auto max-w-[1760px] px-4 pt-10 lg:px-6 ${className}`}>
       <div className="mb-4 flex items-end justify-between gap-4">
         <h2 className="font-display text-[28px] font-semibold leading-none md:text-[32px]">{title}</h2>
         {href ? (

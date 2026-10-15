@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Search" };
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div className="mx-auto max-w-7xl px-4 py-10 text-muted">Searching…</div>}>
+    <Suspense fallback={<div className="mx-auto max-w-[1760px] px-4 lg:px-6 py-10 text-muted">Searching…</div>}>
       <SearchResults />
     </Suspense>
   );

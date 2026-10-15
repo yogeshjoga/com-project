@@ -23,7 +23,7 @@ export default async function BrandPage({ params }: PageProps<"/brand/[slug]">) 
     <>
       <PageHead title={b.name} blurb={`${b.name} products in stock at EgireRobotics, with a GST invoice on every order.`} crumbs={[{ label: "Brands", href: "/brands" }, { label: b.name }]} />
       {b.logoUrl || b.website ? (
-        <div className="mx-auto -mt-2 mb-6 flex max-w-7xl flex-wrap items-center gap-4 px-4">
+        <div className="mx-auto -mt-2 mb-6 flex max-w-[1760px] flex-wrap items-center gap-4 px-4 lg:px-6">
           {b.logoUrl ? (
             <div className="flex h-24 w-60 items-center justify-center rounded-lg border border-line bg-white px-6">
               <BrandLogo name={b.name} logoUrl={b.logoUrl} width={b.logoWidth} height={b.logoHeight} maxW={180} maxH={56} area={4600} priority />
@@ -36,7 +36,7 @@ export default async function BrandPage({ params }: PageProps<"/brand/[slug]">) 
           ) : null}
         </div>
       ) : null}
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="mx-auto max-w-[1760px] px-4 lg:px-6">
         <Listing items={await productsByBrand(slug)} />
       </div>
     </>

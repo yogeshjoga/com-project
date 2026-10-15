@@ -12,7 +12,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40">
       <div className="hidden bg-ink-2 text-[13px] text-white/80 md:block">
-        <div className="mx-auto flex h-8 max-w-7xl items-center justify-between px-4">
+        <div className="mx-auto flex h-8 max-w-[1760px] items-center justify-between px-4 lg:px-6">
           <p>Free shipping on orders over {formatINR(brand.freeShippingAbove)}. GST invoice on every order.</p>
           <div className="flex items-center gap-5">
             <Link href="/track-order" className="hover:text-white">Track order</Link>
@@ -23,7 +23,7 @@ export function Header() {
       </div>
 
       <div className="bg-ink text-white">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 md:gap-6">
+        <div className="mx-auto flex max-w-[1760px] items-center gap-3 px-4 lg:px-6 py-3 md:gap-6">
           <MobileMenu />
           <Logo />
           <div className="hidden flex-1 md:block">
@@ -39,7 +39,7 @@ export function Header() {
       </div>
 
       <nav aria-label="Departments" className="hidden border-b border-line bg-white lg:block">
-        <ul className="mx-auto flex max-w-7xl items-stretch gap-1 px-4 text-sm">
+        <ul className="mx-auto flex max-w-[1760px] items-stretch gap-1 px-4 lg:px-6 text-sm">
           {departments.map((d) => (
             <li key={d.slug} className="group relative">
               <Link

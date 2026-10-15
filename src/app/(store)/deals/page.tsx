@@ -9,7 +9,7 @@ export default async function DealsPage() {
   return (
     <>
       <PageHead title="Hot deals" blurb="Marked-down drones, gear and parts that are in stock and ready to ship." crumbs={[{ label: "Hot deals" }]} />
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="mx-auto max-w-[1760px] px-4 lg:px-6">
         <Listing items={await hotDeals(500)} />
       </div>
     </>

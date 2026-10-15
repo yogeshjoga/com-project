@@ -124,7 +124,9 @@ export function displayName(brand: string, title: string) {
 
 async function getJson(url: string) {
   for (let attempt = 0; attempt < 3; attempt++) {
-    const res = await fetch(url, { headers: { ...UA, accept: "application/json" }, signal: AbortSignal.timeout(45000) });
+    // Network errors (DNS, reset connections) are retried like server errors.
+    const res = await fetch(url, { headers: { ...UA, accept: "application/json" }, signal: AbortSignal.timeout(45000) }).catch(() => null);
+    if (!res) { await sleep(3000 * (attempt + 1)); continue; }
     if (res.status === 429 || res.status >= 500) { await sleep(3000 * (attempt + 1)); continue; }
     if (!res.ok) throw new Error(`${url} → HTTP ${res.status}`);
     return res.json();
@@ -215,10 +217,29 @@ interface WooProduct {
   variations: { id: number; attributes: { name: string; value: string }[] }[];
 }
 
+/** Each option's own price: the Store API lists variations separately (100 per page). */
+async function wooVariationPrices(base: string, log: (m: string) => void) {
+  const prices = new Map<number, number>();
+  for (let page = 1; page <= 200; page++) {
+    const list = (await getJson(`${base}/wp-json/wc/store/v1/products?type=variation&per_page=100&page=${page}`)) as {
+      id: number; prices?: { price: string; currency_minor_unit: number };
+    }[];
+    for (const v of list) {
+      const n = Number(v.prices?.price) / 10 ** (v.prices?.currency_minor_unit ?? 2);
+      if (n > 0) prices.set(v.id, Math.round(n * 100) / 100);
+    }
+    if (list.length < 100) break;
+    await sleep(800);
+  }
+  log(`${base}: ${prices.size} option prices`);
+  return prices;
+}
+
 async function woocommerce(src: Source, log: (m: string) => void): Promise<OfficialItem[]> {
   const host = new URL(src.base).host.replace(/^www\./, "");
   const out: OfficialItem[] = [];
   let skipped = 0;
+  const optionPrices = await wooVariationPrices(src.base, log);
   for (let page = 1; page <= 60; page++) {
     const list = (await getJson(`${src.base}/wp-json/wc/store/v1/products?per_page=100&page=${page}`)) as WooProduct[];
     for (const p of list) {
@@ -254,7 +275,7 @@ async function woocommerce(src: Source, log: (m: string) => void): Promise<Offic
           let label = clip(decode(v.attributes.map((a) => a.value).join(" / ") || `Option ${i + 1}`), 80);
           if (seen.has(label.toLowerCase())) label = `${clip(label, 66)} (${v.id})`;
           seen.add(label.toLowerCase());
-          return { source_key: `${host}:woocommerce:v:${v.id}`, label, sku: null, image_url: null, sort: i };
+          return { source_key: `${host}:woocommerce:v:${v.id}`, label, sku: null, image_url: null, sort: i, source_price: optionPrices.get(v.id) ?? null };
         }) : [],
       });
     }

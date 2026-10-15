@@ -16,7 +16,7 @@ export default function CartPage() {
   return (
     <>
       <PageHead title="Cart" crumbs={[{ label: "Cart" }]} />
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="mx-auto max-w-[1760px] px-4 lg:px-6">
         {!ready ? (
           <div className="h-64 animate-pulse rounded-lg bg-white ring-1 ring-line" />
         ) : cart.length === 0 ? (

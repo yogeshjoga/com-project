@@ -18,6 +18,12 @@
   --danger: #b42318;
 }
 
+/* Wide-screen steps for the Amazon-style dense grids (1440px and 1700px), ordered after 2xl. */
+@theme {
+  --breakpoint-wide: 90rem;
+  --breakpoint-ultra: 106.25rem;
+}
+
 @theme inline {
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);

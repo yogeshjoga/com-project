@@ -14,7 +14,7 @@ export function AnnouncementBar({ items }: { items: Announcement[] }) {
   const text = <span className="font-medium">{a.message}</span>;
   return (
     <div role="status" className={`${tones[a.tone]} text-center text-sm`}>
-      <div className="mx-auto max-w-7xl px-4 py-2">
+      <div className="mx-auto max-w-[1760px] px-4 lg:px-6 py-2">
         {a.link ? (
           <Link href={a.link} className="underline-offset-4 hover:underline">
             {text}

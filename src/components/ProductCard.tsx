@@ -15,7 +15,7 @@ export function ProductCard({ p }: { p: ProductSummary }) {
   const off = discountPct(p.price, p.mrp);
   return (
     <article className="group relative flex h-full flex-col rounded-lg border border-line bg-surface p-3 transition-colors hover:border-ink/40">
-      <div className="relative mb-3 aspect-[4/3] overflow-hidden rounded-md bg-paper">
+      <div className="relative mb-3 aspect-square overflow-hidden rounded-md bg-paper">
         <Link href={`/product/${p.slug}`} tabIndex={-1} aria-hidden="true">
           <ProductMedia imageUrl={p.imageUrl} art={p.art} hue={p.hue} alt={p.name} className="size-full p-3 transition-transform duration-300 group-hover:scale-[1.04]" />
         </Link>
@@ -51,9 +51,15 @@ export function ProductCard({ p }: { p: ProductSummary }) {
   );
 }
 
-export function ProductGrid({ items }: { items: ProductSummary[] }) {
+// Columns grow with the screen, Amazon-style: up to 8 across on a wide page, 6 beside a filter sidebar.
+const GRID = {
+  page: "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 wide:grid-cols-7 ultra:grid-cols-8",
+  sidebar: "grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 wide:grid-cols-5 ultra:grid-cols-6",
+};
+
+export function ProductGrid({ items, layout = "page" }: { items: ProductSummary[]; layout?: keyof typeof GRID }) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    <div className={`grid gap-3 ${GRID[layout]}`}>
       {items.map((p) => (
         <ProductCard key={p.id} p={p} />
       ))}
@@ -65,7 +71,7 @@ export function ProductRail({ items }: { items: ProductSummary[] }) {
   return (
     <div className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2">
       {items.map((p) => (
-        <div key={p.id} className="w-[46%] shrink-0 snap-start sm:w-[30%] lg:w-[19%]">
+        <div key={p.id} className="w-[46%] shrink-0 snap-start sm:w-[31%] md:w-[23.5%] lg:w-[18.8%] xl:w-[15.6%] wide:w-[13.4%] ultra:w-[11.7%]">
           <ProductCard p={p} />
         </div>
       ))}

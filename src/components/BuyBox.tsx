@@ -87,10 +87,10 @@ export function BuyBox({ p }: { p: Buyable }) {
       {stock > 0 ? (
         <div className="flex flex-wrap items-center gap-3">
           <QtyStepper value={qty} max={stock} onChange={setQty} />
-          <button type="button" onClick={() => addToCart()} className="h-11 flex-1 rounded-md bg-ink px-6 font-medium text-white hover:bg-ink-2">
+          <button type="button" onClick={() => addToCart()} className="h-11 min-w-[8.5rem] flex-1 whitespace-nowrap rounded-md bg-ink px-6 font-medium text-white hover:bg-ink-2">
             Add to cart
           </button>
-          <button type="button" onClick={() => addToCart(true)} className="h-11 flex-1 rounded-md bg-signal px-6 font-semibold text-ink hover:bg-signal-hover">
+          <button type="button" onClick={() => addToCart(true)} className="h-11 min-w-[8.5rem] flex-1 whitespace-nowrap rounded-md bg-signal px-6 font-semibold text-ink hover:bg-signal-hover">
             Buy now
           </button>
           <WishButton slug={p.slug} className="ring-1 ring-line" />

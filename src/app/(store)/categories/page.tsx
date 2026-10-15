@@ -12,7 +12,7 @@ export default async function CategoriesPage() {
   return (
     <>
       <PageHead title="All categories" crumbs={[{ label: "All categories" }]} />
-      <div className="mx-auto max-w-7xl space-y-10 px-4">
+      <div className="mx-auto max-w-[1760px] space-y-10 px-4 lg:px-6">
         {departments.map((d) => (
           <section key={d.slug}>
             <h2 className="mb-3 font-display text-2xl font-semibold">

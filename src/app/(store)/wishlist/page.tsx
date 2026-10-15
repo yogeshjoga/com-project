@@ -15,7 +15,7 @@ export default function WishlistPage() {
   return (
     <>
       <PageHead title="Wishlist" crumbs={[{ label: "Wishlist" }]} />
-      <div className="mx-auto max-w-7xl px-4">
+      <div className="mx-auto max-w-[1760px] px-4 lg:px-6">
         {!ready || (wishlist.length > 0 && !loaded) ? (
           <div className="h-64 animate-pulse rounded-lg bg-white ring-1 ring-line" />
         ) : saved.length ? (

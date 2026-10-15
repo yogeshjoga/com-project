@@ -53,7 +53,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-      <div className="mx-auto max-w-7xl px-4 pt-6">
+      <div className="mx-auto max-w-[1760px] px-4 lg:px-6 pt-6">
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
@@ -63,8 +63,9 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
           ]}
         />
 
-        <div className="mt-5 grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-12">
-          <div className="lg:sticky lg:top-40 lg:self-start">
+        {/* Gallery | details | buy box on wide screens; the buy box drops under the details below xl. */}
+        <div className="mt-5 grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:gap-10 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_340px]">
+          <div className="lg:sticky lg:top-40 lg:row-span-2 lg:self-start xl:row-span-1">
             <ProductGallery images={p.images} name={p.name} art={p.art} hue={p.hue} />
           </div>
 
@@ -82,12 +83,14 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
                 <li key={h} className="flex gap-2"><span className="mt-2 size-1.5 shrink-0 rounded-full bg-signal" aria-hidden="true" />{h}</li>
               ))}
             </ul>
+          </div>
 
-            <div className="mt-6 border-t border-line pt-6">
+          <div className="lg:col-start-2 xl:sticky xl:top-40 xl:col-start-3 xl:row-start-1 xl:self-start">
+            <div className="border-t border-line pt-6 xl:rounded-lg xl:border-t-0 xl:bg-white xl:p-5 xl:ring-1 xl:ring-line">
               <BuyBox p={buyable} />
             </div>
 
-            <ul className="mt-6 grid grid-cols-3 gap-2 text-center text-xs text-muted">
+            <ul className="mt-4 grid grid-cols-3 gap-2 text-center text-xs text-muted">
               <li className="rounded-md bg-white p-3 ring-1 ring-line"><TruckIcon className="mx-auto mb-1 text-ink" />Ships in 24 h</li>
               <li className="rounded-md bg-white p-3 ring-1 ring-line"><ShieldIcon className="mx-auto mb-1 text-ink" />Genuine, with warranty</li>
               <li className="rounded-md bg-white p-3 ring-1 ring-line"><ReceiptIcon className="mx-auto mb-1 text-ink" />GST invoice</li>
@@ -106,7 +109,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
               ) : null}
             </div>
             {/* Official description from the brand, sanitised at import (structural tags only). */}
-            <div className="official-desc mt-3 rounded-lg bg-white p-5 ring-1 ring-line md:p-8" dangerouslySetInnerHTML={{ __html: description }} />
+            <div className="official-desc mt-3 rounded-lg bg-white p-5 ring-1 ring-line md:p-8 [&>*]:max-w-[100ch]" dangerouslySetInnerHTML={{ __html: description }} />
           </section>
         ) : null}
 
