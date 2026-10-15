@@ -181,7 +181,81 @@ const tmotor: HtmlSource = {
   },
 };
 
-export const HTML_SOURCES: HtmlSource[] = [iflight, speedybee, tmotor];
+// ───────────────────────── DJI (official store): product sitemap → page state (window.__PRELOADED_STATE__)
+
+const DJI_DRONE = /^dji-(mini|air|mavic|avata|neo|flip|fpv|inspire|matrice|agras|phantom|lito)/;
+const DJI_NOT_DRONE =
+  /refurbished|battery|propell|charg|filter|case|bag|strap|cable|hub|guard|lens|cover|mount|adapter|holder|sticker|landing|antenna|care|frame|protector|parachute|storage|screen|hood|module|motor|arm|shell|badge|t-shirt|license|damper|connector|controller$|remote|goggles|light|speaker|spotlight|-tw$|-sb(-\d+)?$/;
+/** DJI's CDN serves fixed sizes; keep the 640px one (the store's loader picks smaller ones by width). */
+const djiImg = (u: string) => `https:${u.replace(/^https?:/, "")}`.split("?")[0].replace(/@[a-z_0-9]+\.(jpg|png|webp)$/, "@xlarge.$1");
+const djiSeen = new Set<string>();
+
+const dji: HtmlSource = {
+  brand: "DJI",
+  base: "https://store.dji.com",
+  async list(log) {
+    const urls = locs(await text("https://assets.djicdn.com/sitemap/store/store-us.xml"))
+      .filter((u) => /\/product\//.test(u))
+      .filter((u) => {
+        const slug = u.split("/product/")[1] ?? "";
+        return DJI_DRONE.test(slug) && !DJI_NOT_DRONE.test(slug);
+      });
+    log(`DJI: ${urls.length} candidate drone pages`);
+    return [...new Set(urls)].map((url) => ({ url }));
+  },
+  parse(url, _doc, raw) {
+    const at = raw.indexOf("window.__PRELOADED_STATE__");
+    if (at < 0) return null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let st: any;
+    try {
+      const body = raw.slice(raw.indexOf("=", at) + 1).trimStart();
+      // The state is followed by other statements in the same script tag.
+      const end = body.search(/;\s*window\.|<\/script>/);
+      st = JSON.parse(body.slice(0, end).trim().replace(/;$/, ""));
+    } catch {
+      return null;
+    }
+    const meta = st?.shoppingFlow?.meta;
+    const slug = url.split("/product/")[1];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const v = (st?.products?.variants ?? []).find((x: any) => x.slug === slug) ?? (st?.products?.variants ?? []).find((x: any) => x.id === meta?.selectedVariant);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const p = (st?.products?.products ?? []).find((x: any) => x.id === v?.productId);
+    const crumbs: string[] = (meta?.breadcrumbs ?? []).map((b: { title?: string }) => b.title ?? "");
+    // Only main products (DJI Care-eligible) with a price, in DJI's drone categories. Newer pages
+    // (Neo, Flip) carry no breadcrumbs; the drone-name filter on the slug already applies to them.
+    const inDroneCategory = crumbs.filter(Boolean).length === 0 || crumbs.some((c) => /drone|fpv|enterprise|agricultur/i.test(c));
+    if (!v || v.variantCategory !== "dji_care_main" || !(v.price > 0) || !inDroneCategory) return null;
+    const title = decode(v.title).replace(/\s+/g, " ").trim();
+    if (djiSeen.has(title.toLowerCase())) return null; // regional duplicates of the same kit
+    djiSeen.add(title.toLowerCase());
+
+    const images = [v.cover?.large ?? v.cover?.origin, ...(v.carousels ?? []).map((c: { large?: string; origin?: string }) => c.large ?? c.origin)]
+      .filter(Boolean)
+      .map(djiImg);
+    const points = [...String(v.coreSpecs ?? "").matchAll(/<p>(.*?)<\/p>/g)].map((m) => decode(m[1].replace(/<[^>]+>/g, "")).trim()).filter(Boolean);
+    const inBox = (p?.inTheBoxes ?? []).map((b: { name?: string; quantity?: number }) => `${b.name}${b.quantity && b.quantity > 1 ? ` × ${b.quantity}` : ""}`).filter((x: string) => x && !x.startsWith("undefined"));
+    const short = decode(String(v.shortSummary || p?.description || "")).trim();
+    const desc = cleanDescription(
+      `${short ? `<p>${short}</p>` : ""}` +
+        (points.length ? `<h3>Highlights</h3><ul>${points.map((x) => `<li>${x}</li>`).join("")}</ul>` : "") +
+        (inBox.length ? `<h3>In the box</h3><ul>${inBox.map((x: string) => `<li>${x}</li>`).join("")}</ul>` : ""),
+    );
+    const category = "camera-drones"; // every DJI drone is listed under Camera drones
+    return {
+      source: "html", source_key: `store.dji.com:html:${v.id}`, source_url: url,
+      sku: v.ean ? String(v.ean) : `DJI-${v.id}`, slug: slugify(displayName("DJI", title)),
+      name: displayName("DJI", title), brand: "DJI", category, art: artFor(category),
+      short: clip(short, 280), highlights: points.slice(0, 6).map((x) => clip(x, 120)), specs: {},
+      images: [...new Set(images)].slice(0, 8), description_html: desc,
+      source_price: Math.round(Number(v.price) * 100) / 100, source_currency: "USD",
+      variant_name: null, variants: [],
+    };
+  },
+};
+
+export const HTML_SOURCES: HtmlSource[] = [iflight, speedybee, tmotor, dji];
 
 export async function fetchHtmlSource(src: HtmlSource, log: (m: string) => void = () => {}, limit = Infinity) {
   const pages = (await src.list(log)).slice(0, limit);
