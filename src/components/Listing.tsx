@@ -30,10 +30,13 @@ export function Listing({
   items,
   groups,
   emptyText = "No products in this list yet.",
+  emptyAction,
 }: {
   items: ProductSummary[];
   groups?: { key: string; label: string }[];
   emptyText?: string;
+  /** Shown under the empty message, e.g. a link to request something made to order. */
+  emptyAction?: React.ReactNode;
 }) {
   const [sort, setSort] = useState<Sort>("featured");
   const [brandSel, setBrandSel] = useState<string[]>([]);
@@ -158,6 +161,7 @@ export function Listing({
         ) : (
           <div className="rounded-lg border border-dashed border-line bg-white p-10 text-center">
             <p className="font-medium">{items.length ? "Nothing matches these filters." : emptyText}</p>
+            {!items.length ? emptyAction : null}
             {active ? <button type="button" onClick={reset} className="mt-3 text-sm font-medium text-signal-ink hover:underline">Clear filters</button> : null}
           </div>
         )}

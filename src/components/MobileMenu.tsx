@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLayoutEffect, useState } from "react";
-import { categories, departments } from "@/data/categories";
+import { categories, departmentExtras, departments } from "@/data/categories";
 import { CloseIcon, MenuIcon } from "./icons";
 
 export function MobileMenu() {
@@ -40,6 +40,11 @@ export function MobileMenu() {
                       {c.name}
                     </Link>
                   ))}
+                  {departmentExtras[d.slug] ? (
+                    <Link onNavigate={close} href={departmentExtras[d.slug].href} className="block px-6 py-2.5 text-sm font-semibold text-signal-ink">
+                      {departmentExtras[d.slug].label}
+                    </Link>
+                  ) : null}
                 </div>
               </details>
             ))}

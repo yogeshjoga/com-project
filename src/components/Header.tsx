@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { brand } from "@/config/brand";
-import { categoriesIn, departments } from "@/data/categories";
+import { categoriesIn, departmentExtras, departments } from "@/data/categories";
 import { formatINR } from "@/lib/format";
 import { Logo } from "./Logo";
 import { SearchBox } from "./SearchBox";
@@ -44,10 +44,10 @@ export function Header() {
             <li key={d.slug} className="group relative">
               <Link
                 href={`/department/${d.slug}`}
-                className="flex h-11 items-center gap-1 whitespace-nowrap px-2 font-medium text-ink hover:text-signal-ink group-focus-within:text-signal-ink xl:px-2.5"
+                className="flex h-11 items-center gap-1 whitespace-nowrap px-1.5 font-medium text-ink hover:text-signal-ink group-focus-within:text-signal-ink xl:px-2"
               >
                 {d.name}
-                <ChevronDown className="hidden text-muted xl:block" />
+                <ChevronDown className="hidden text-muted wide:block" />
               </Link>
               <div className="invisible absolute left-0 top-full z-50 w-64 rounded-b-md border border-t-0 border-line bg-white p-2 opacity-0 shadow-lg transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
                 {categoriesIn(d.slug).map((c) => (
@@ -55,17 +55,22 @@ export function Header() {
                     {c.name}
                   </Link>
                 ))}
+                {departmentExtras[d.slug] ? (
+                  <Link href={departmentExtras[d.slug].href} className="mt-1 block rounded border-t border-line px-3 py-2 font-medium text-signal-ink hover:bg-paper">
+                    {departmentExtras[d.slug].label}
+                  </Link>
+                ) : null}
               </div>
             </li>
           ))}
           <li className="ml-auto">
-            <Link href="/deals" className="flex h-11 items-center whitespace-nowrap px-2.5 font-semibold text-signal-ink">Hot deals</Link>
+            <Link href="/deals" className="flex h-11 items-center whitespace-nowrap px-2 font-semibold text-signal-ink">Hot deals</Link>
           </li>
-          <li className="hidden xl:block">
+          <li className="hidden wide:block">
             <Link href="/new" className="flex h-11 items-center whitespace-nowrap px-2.5 font-medium">Just landed</Link>
           </li>
           <li>
-            <Link href="/brands" className="flex h-11 items-center px-2.5 font-medium">Brands</Link>
+            <Link href="/brands" className="flex h-11 items-center px-2 font-medium">Brands</Link>
           </li>
         </ul>
       </nav>

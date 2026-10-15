@@ -9,7 +9,13 @@ export const departments: Department[] = [
   { slug: "cameras", name: "Cameras & gimbals" },
   { slug: "electronics", name: "Electronics" },
   { slug: "tools", name: "Tools & gear" },
+  { slug: "printing", name: "Printing service" },
 ];
+
+/** Departments that also link to a page that isn't a product list, shown at the end of their menu. */
+export const departmentExtras: Record<string, { label: string; href: string }> = {
+  printing: { label: "Custom printing service", href: "/printing-service" },
+};
 
 export const categories: Category[] = [
   { slug: "fpv-drones", name: "FPV drones", department: "drones", art: "quad", blurb: "Ready-to-fly, bind-and-fly and plug-and-play quads from 3 to 10 inch." },
@@ -50,6 +56,12 @@ export const categories: Category[] = [
   { slug: "soldering", name: "Soldering", department: "tools", art: "iron", blurb: "Smart irons, stations, solder, flux and fume extraction." },
   { slug: "hand-tools", name: "Hand tools", department: "tools", art: "tool", blurb: "Hex drivers, prop tools, nut drivers and build mats." },
   { slug: "bags-cases", name: "Bags & cases", department: "tools", art: "bag", blurb: "Backpacks, hard cases and LiPo-safe bags." },
+
+  { slug: "gps-supports", name: "GPS supports", department: "printing", art: "gps", blurb: "3D printed GPS mounts and masts that lift the module clear of the frame." },
+  { slug: "battery-supports", name: "Battery supports", department: "printing", art: "battery", blurb: "3D printed battery holders, pads and supports sized to your frame." },
+  { slug: "prop-guards", name: "Prop guards", department: "printing", art: "prop", blurb: "3D printed prop guards and bumpers for indoor flying and cinewhoops." },
+  { slug: "ball-frames", name: "Ball frame prints", department: "printing", art: "frame", blurb: "3D printed ball-frame and cage parts for collision-tolerant drones." },
+  { slug: "printed-cases", name: "Cases", department: "printing", art: "bag", blurb: "3D printed cases and enclosures for flight controllers, receivers, VTX and electronics." },
 ];
 
 export const categoryBySlug = new Map(categories.map((c) => [c.slug, c]));

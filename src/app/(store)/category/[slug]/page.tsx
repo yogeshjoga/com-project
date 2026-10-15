@@ -4,6 +4,7 @@ import { categories, categoryBySlug, departmentBySlug } from "@/data/categories"
 import { productsInCategory } from "@/lib/catalog";
 import { PageHead } from "@/components/PageHead";
 import { Listing } from "@/components/Listing";
+import { PrintingCta, PrintingEmptyAction } from "@/components/PrintingCta";
 
 export function generateStaticParams() {
   return categories.map((c) => ({ slug: c.slug }));
@@ -23,7 +24,12 @@ export default async function CategoryPage({ params }: PageProps<"/category/[slu
     <>
       <PageHead title={c.name} blurb={c.blurb} crumbs={[{ label: d.name, href: `/department/${d.slug}` }, { label: c.name }]} />
       <div className="mx-auto max-w-[110rem] px-4 lg:px-6">
-        <Listing items={await productsInCategory(slug)} emptyText="We're restocking this category. Check back soon." />
+        {d.slug === "printing" ? <PrintingCta /> : null}
+        <Listing
+          items={await productsInCategory(slug)}
+          emptyText={d.slug === "printing" ? "These are printed to order. Tell us what you need and we’ll quote it." : "We're restocking this category. Check back soon."}
+          emptyAction={d.slug === "printing" ? <PrintingEmptyAction /> : undefined}
+        />
       </div>
     </>
   );
